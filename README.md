@@ -52,18 +52,21 @@ npm run preview   # preview the production build
 
 ## Map — where things live
 
-- `src/lib/` — third-party wrappers; `client.js` is the shared Supabase client (spec 02).
-- `src/components/` — presentational building blocks (e.g. `Card`, spec 04).
-- `src/pages/` — thin route templates: each page composes components and reads route params only — no data fetching or business logic (spec 03).
+- `src/lib/` — shared client + logic; `client.js` is the Supabase client (spec 02), `useCreator.js` the shared single-creator fetch hook.
+- `src/components/` — presentational building blocks: `Card` (spec 04) and the shared `CreatorForm` used by both add and edit pages.
+- `src/pages/` — thin route templates: each page composes components, reads route params, and wires handlers; data loading lives in the shared `useCreator` hook (spec 06).
 - `src/main.jsx` — entry point; wraps `<App />` in `<BrowserRouter>`.
-- `src/App.jsx` — route table via `useRoutes` (implemented in spec 03).
+- `src/App.jsx` — route table via `useRoutes` (spec 03).
 - `docs/specs/active/creatorverse/` — the spec chain, one file per phase.
 
-Templates vs components: pages orchestrate, components render, hooks hold logic.
+Pages orchestrate, components render, hooks hold shared logic.
 
 Tests are co-located: each `*.test.jsx` sits next to the file it tests.
 
 ## Current state
 
-Spec 01 (project setup + toolchain) implemented. Remaining specs 02–09 in
-progress; stretch (10) and submission README (11) deferred.
+Specs 01–09 implemented (CRUD complete): scaffold + toolchain, Supabase
+client, routes, Card, list/detail/add/update/delete. The database half of
+spec 02 (provisioning the Supabase project + seed) is pending — the app runs
+against placeholder `.env` until a real project is configured. Stretch
+styling (10) and the submission README (11) are deferred.
