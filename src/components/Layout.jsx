@@ -5,9 +5,11 @@
  * @param {React.ReactNode} props.children - The matched route's page.
  * @returns {JSX.Element} The app shell.
  */
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Layout({ children }) {
+  const { pathname } = useLocation()
+
   return (
     <>
       <header className="app-header">
@@ -26,7 +28,11 @@ export default function Layout({ children }) {
           </nav>
         </div>
       </header>
-      <main>{children}</main>
+      <main>
+        <div className="page-enter" key={pathname}>
+          {children}
+        </div>
+      </main>
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>Creatorverse — curating the creators worth following.</span>

@@ -17,12 +17,15 @@ import { Link } from 'react-router-dom'
  * @param {string|null} props.imageURL - Image URL; falls back to an initial.
  * @returns {JSX.Element} The card article.
  */
-export default function Card({ id, name, url, description, imageURL }) {
+export default function Card({ id, name, url, description, imageURL, index = 0 }) {
   const [imgFailed, setImgFailed] = useState(false)
   const showImage = imageURL && !imgFailed
 
   return (
-    <article className="card">
+    <article
+      className="card"
+      style={{ '--card-i': Math.min(index, 6) }}
+    >
       <div className="card-media">
         {showImage ? (
           <img

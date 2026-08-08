@@ -146,6 +146,74 @@
   width: 100%;
 }
 
+/* ---------- Entrance motion ---------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gradient-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* Route-level entrance: re-triggers on navigation. */
+.page-enter {
+  animation: fade-up var(--dur-slow) var(--ease-out) both;
+}
+
+/* Hero: title, subtitle, actions, search stagger in. */
+.hero-title {
+  animation:
+    fade-up var(--dur-slow) var(--ease-out) both,
+    gradient-drift 12s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+.hero-subtitle {
+  animation: fade-up var(--dur-slow) var(--ease-out) 100ms both;
+}
+
+.hero-actions {
+  animation: fade-up var(--dur-slow) var(--ease-out) 200ms both;
+}
+
+.hero .search {
+  animation: fade-up var(--dur-slow) var(--ease-out) 300ms both;
+}
+
+/* Cards cascade in after the list loads (overrides the pre-delay above). */
+.creator-grid .card {
+  animation: fade-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--card-i, 0) * 70ms);
+}
+
+/* Profile / forms fade in on the detail + edit pages. */
+.profile,
+.form-card {
+  animation: fade-up var(--dur-slow) var(--ease-out) both;
+}
+
 /* ---------- Hero ---------- */
 
 .hero {

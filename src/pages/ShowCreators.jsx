@@ -104,8 +104,8 @@ export default function ShowCreators() {
         </div>
       ) : (
         <div className="creator-grid">
-          {visible.map((creator) => (
-            <Card key={creator.id} {...creator} />
+          {visible.map((creator, i) => (
+            <Card key={creator.id} index={i} {...creator} />
           ))}
         </div>
       )}

@@ -136,6 +136,15 @@ restores focus to the previously focused element.
   `prefers-reduced-motion` block. Every text/background pair in the palette
   verified ≥4.5:1. Token set still 2 fonts (Space Grotesk + Inter) and a real
   4px-base spacing scale.
+- **Entrance motion added (per WEB-DESIGN-RULES motion step):** one orchestrated
+  entrance set instead of scattered micro-animations. `Layout` wraps each route
+  in a `page-enter` div keyed by `pathname` (fade-up replays on navigation);
+  hero title/subtitle/actions/search stagger in (100/200/300ms); creator cards
+  cascade via `--card-i` (70ms each, capped at index 6); the hero title's
+  signature white→violet gradient drifts slowly (`gradient-drift`, 12s infinite
+  alternate, `background-size: 200%`). Motion tokens added: `--dur-slow`,
+  `--ease-out`. All animations inherit the global `prefers-reduced-motion`
+  kill-switch (0.01ms, 1 iteration).
 
 ## Tests
 - `design_system_applied` (replaces `pico_applied`): a loaded `<style>` tag
