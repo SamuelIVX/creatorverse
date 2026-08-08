@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import Card from '../components/Card'
 
@@ -15,6 +16,9 @@ export default function ShowCreators() {
 
   return (
     <main>
+      <Link to="/add">
+        <button type="button">Add Creator</button>
+      </Link>
       {creators.length === 0 ? (
         <p>No creators yet — add one!</p>
       ) : (
