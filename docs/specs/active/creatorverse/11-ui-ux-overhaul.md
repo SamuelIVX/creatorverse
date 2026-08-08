@@ -126,6 +126,16 @@ restores focus to the previously focused element.
   errors and renders a distinct failure state (not the empty state). The detail
   avatar failure state is keyed by URL so a reused route instance shows a new
   creator's valid image. 67 tests pass.
+- **Design-rules audit (WEB-DESIGN-RULES.md):** fixed three WCAG AA contrast
+  failures in the token palette — `--text-faint` #6b6b7a→#8b8b9a (3.77→5.89 on
+  bg); links use `--color-accent-bright` #a78bfa + hover #b39cfb (was accent-
+  strong, 3.47 on surface); `.btn-primary` bg moved to `--color-accent-strong`
+  #7c3aed (white-on-accent was 4.23, now 5.70) with `--color-accent-deep`
+  #6d28d9 hover (7.10); `.btn-danger:hover` bg moved to `--color-danger-strong`
+  #dc2626 (white-on-danger was 2.77, now 4.83). Added a
+  `prefers-reduced-motion` block. Every text/background pair in the palette
+  verified ≥4.5:1. Token set still 2 fonts (Space Grotesk + Inter) and a real
+  4px-base spacing scale.
 
 ## Tests
 - `design_system_applied` (replaces `pico_applied`): a loaded `<style>` tag
