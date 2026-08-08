@@ -35,6 +35,7 @@ card. These are the prework's optional stretch features.
 - Core CRUD complete (specs 01–09). [prerequisite]
 - PicoCSS is not yet installed; this spec owns `npm install @picocss/pico`. [confirmed — spec 01 excludes styling]
 - `Card` conditionally renders `imageURL`. [confirmed — spec 04]
+- **Implementation note:** Pico v2.1.1 installed (`@picocss/pico`, main = `css/pico.min.css`) and imported once in `src/main.jsx` above `./index.css` so custom rules override Pico defaults. Grid and image sizing live in `src/index.css` (`.creator-grid`, `.card-image`). To make `pico_applied` testable, `test.css: true` was added to the `vite.config.js` `test` block — a test-only config change, slightly beyond this spec's "Modifies" list.
 
 ## Tests
 - `pico_applied`: Pico stylesheet is loaded (semantic elements pick up Pico styles).

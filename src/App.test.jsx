@@ -6,6 +6,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
+import '@picocss/pico'
+import './index.css'
 
 vi.mock('./lib/client', () => {
   const chain = (id) => ({
@@ -45,6 +47,16 @@ function renderAt(path) {
 }
 
 describe('routes', () => {
+  it('pico_applied: stylesheet is loaded', async () => {
+    renderAt('/')
+    await screen.findByText(/no creators yet/i)
+    const styles = Array.from(document.querySelectorAll('style'))
+    const picoLoaded = styles.some((s) =>
+      s.textContent.includes('--pico-') || s.textContent.includes('.creator-grid'),
+    )
+    expect(picoLoaded).toBe(true)
+  })
+
   it('routes_render_pages: / renders ShowCreators', async () => {
     renderAt('/')
     expect(await screen.findByText(/no creators yet/i)).toBeInTheDocument()
