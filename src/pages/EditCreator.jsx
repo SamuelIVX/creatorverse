@@ -41,6 +41,15 @@ export default function EditCreator() {
     navigate(`/creator/${id}`)
   }
 
+  const handleDelete = async () => {
+    const { error } = await supabase.from('creators').delete().eq('id', id)
+    if (error) {
+      setError(error.message)
+      return
+    }
+    navigate('/')
+  }
+
   if (loading) return <p>Loading…</p>
   if (!found) return <p>Creator not found.</p>
 
@@ -89,6 +98,7 @@ export default function EditCreator() {
         </label>
         {error && <p role="alert">{error}</p>}
         <button type="submit">Update Creator</button>
+        <button type="button" onClick={handleDelete}>Delete</button>
       </form>
     </main>
   )
