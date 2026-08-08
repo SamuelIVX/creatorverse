@@ -49,6 +49,14 @@ describe('Card', () => {
     )
   })
 
+  it('edit_link_uses_id', () => {
+    renderCard(baseProps)
+    expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/edit/1',
+    )
+  })
+
   it('image_conditional: renders the image when imageURL is provided', () => {
     renderCard({ ...baseProps, imageURL: 'https://example.com/avatar.jpg' })
     expect(screen.getByRole('img', { name: /tech with tim/i })).toHaveAttribute(

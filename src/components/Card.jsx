@@ -10,6 +10,7 @@ export default function Card({ id, name, url, description, imageURL }) {
         Visit channel
       </a>
       <Link to={`/creator/${id}`}>View details</Link>
+      <Link to={`/edit/${id}`}>Edit</Link>
     </article>
   )
 }

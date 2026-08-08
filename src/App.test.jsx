@@ -52,9 +52,9 @@ describe('routes', () => {
     expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
   })
 
-  it('routes_render_pages: /edit/:id renders EditCreator', () => {
+  it('routes_render_pages: /edit/:id renders EditCreator', async () => {
     renderAt('/edit/9')
-    expect(screen.getByRole('heading', { name: /edit creator 9/i })).toBeInTheDocument()
+    expect(await screen.findByDisplayValue('Creator 9')).toBeInTheDocument()
   })
 
   it('id_param_readable: ViewCreator reads the id from useParams', async () => {
@@ -62,8 +62,8 @@ describe('routes', () => {
     expect(await screen.findByRole('heading', { name: /creator 42/i })).toBeInTheDocument()
   })
 
-  it('id_param_readable: EditCreator reads the id from useParams', () => {
+  it('id_param_readable: EditCreator reads the id from useParams', async () => {
     renderAt('/edit/42')
-    expect(screen.getByRole('heading', { name: /edit creator 42/i })).toBeInTheDocument()
+    expect(await screen.findByDisplayValue('Creator 42')).toBeInTheDocument()
   })
 })

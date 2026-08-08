@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/client'
 
 export default function ViewCreator() {
@@ -31,6 +31,7 @@ export default function ViewCreator() {
       <a href={creator.url} target="_blank" rel="noreferrer">
         Visit channel
       </a>
+      <Link to={`/edit/${creator.id}`}>Edit</Link>
     </article>
   )
 }
