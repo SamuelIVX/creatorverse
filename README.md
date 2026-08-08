@@ -71,4 +71,29 @@ list/detail/add/update/delete, PicoCSS stretch styling (10), and the UI/UX
 overhaul (11) — premium dark-studio design system, app shell, hero + search,
 skeletons, toasts, and delete confirm dialog. The database half of spec 02
 (provisioning the Supabase project + seed) is done — the app runs against a
-real project configured in `.env`. The submission README (12) is deferred.
+real project configured in `.env`.
+
+## Prework submission (CodePath)
+
+Submitted by: **SamuelIVX**
+
+### Required Features
+
+- [x] Logical React component structure
+- [x] Homepage displays ≥ 5 creators
+- [x] Each item shows name, channel link, description
+- [x] async/await data access
+- [x] Click-through to a unique detail page (name, url, description)
+- [x] Edit a creator (name, url, description)
+- [x] Delete a creator
+- [x] Add a creator; it appears in the list
+
+### Stretch Features
+
+- [x] Card layout
+- [x] Image on card
+- [ ] PicoCSS styling (replaced by a hand-rolled design system in spec 11)
+
+### Walkthrough
+
+![Creatorverse walkthrough](walkthrough.gif)
