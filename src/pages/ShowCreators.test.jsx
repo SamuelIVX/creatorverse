@@ -89,6 +89,23 @@ describe('ShowCreators', () => {
     expect(screen.queryAllByRole('article')).toHaveLength(0)
   })
 
+  it('homepage_uses_grid', async () => {
+    mockRows(seedCreators)
+    renderPage()
+    await screen.findByRole('heading', { name: /alice/i })
+    const grid = document.querySelector('.creator-grid')
+    expect(grid).toBeInTheDocument()
+    expect(grid.querySelectorAll('article')).toHaveLength(seedCreators.length)
+  })
+
+  it('card_shows_image', async () => {
+    mockRows([{ ...seedCreators[0], imageURL: 'https://a.example/avatar.png' }])
+    renderPage()
+    const img = await screen.findByRole('img', { name: 'Alice' })
+    expect(img).toHaveAttribute('src', 'https://a.example/avatar.png')
+    expect(img).toHaveClass('card-image')
+  })
+
   it('nav_button_routes_to_add', async () => {
     mockRows([])
     renderWithRoutes()

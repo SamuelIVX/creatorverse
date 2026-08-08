@@ -30,9 +30,11 @@ export default function ShowCreators() {
       {creators.length === 0 ? (
         <p>No creators yet — add one!</p>
       ) : (
-        creators.map((creator) => (
-          <Card key={creator.id} {...creator} />
-        ))
+        <div className="creator-grid">
+          {creators.map((creator) => (
+            <Card key={creator.id} {...creator} />
+          ))}
+        </div>
       )}
     </main>
   )
