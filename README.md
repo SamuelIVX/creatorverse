@@ -24,6 +24,16 @@ npm run lint      # run oxlint
 npm run preview   # preview the production build
 ```
 
+## Setup (Supabase)
+
+1. Create a Supabase project, add the `creators` table (see
+   `docs/specs/active/creatorverse/02-supabase-database.md` for the exact
+   schema), and seed ≥5 rows.
+2. `cp .env.example .env` and fill in your Project URL + anon key
+   (Settings → API). `.env` is gitignored — secrets never committed.
+3. The two database tests (`table_schema_matches`, `seed_has_five_rows`)
+   skip until `.env` has real values, then run automatically.
+
 ## Specs (dependency order)
 
 | # | Spec | One-line summary |
@@ -42,12 +52,16 @@ npm run preview   # preview the production build
 
 ## Map — where things live
 
+- `src/lib/` — third-party wrappers; `client.js` is the shared Supabase client (spec 02).
+- `src/components/` — presentational building blocks (e.g. `Card`, spec 04).
+- `src/pages/` — thin route templates: each page composes components and reads route params only — no data fetching or business logic (spec 03).
 - `src/main.jsx` — entry point; wraps `<App />` in `<BrowserRouter>`.
 - `src/App.jsx` — route table via `useRoutes` (implemented in spec 03).
-- `src/pages/` — `ShowCreators`, `ViewCreator`, `AddCreator`, `EditCreator`.
-- `src/components/` — `Card` (presentational creator card).
-- `src/client.js` — single shared Supabase client (spec 02).
 - `docs/specs/active/creatorverse/` — the spec chain, one file per phase.
+
+Templates vs components: pages orchestrate, components render, hooks hold logic.
+
+Tests are co-located: each `*.test.jsx` sits next to the file it tests.
 
 ## Current state
 

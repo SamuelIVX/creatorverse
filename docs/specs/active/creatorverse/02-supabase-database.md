@@ -7,7 +7,7 @@ importable database handle.
 
 ## Scope
 - Package: `creatorverse`
-- Modifies: `src/client.js` (new), `.env` (new), `.gitignore`, `package.json`
+- Modifies: `src/lib/client.js` (new), `.env` (new), `.gitignore`, `package.json`
 - External: Supabase project + `creators` table (created via Supabase dashboard)
 - Off-limits: page/component files (owned by later specs)
 
@@ -20,13 +20,13 @@ importable database handle.
 2. THE SYSTEM SHALL define a `creators` table with columns `id` (int8, PK, auto), `created_at` (timestamptz, default `now()` — kept from the Supabase table-editor default), `name` (text), `url` (text), `description` (text), and `imageURL` (text, nullable). `id` and `created_at` are non-editable system columns; `name`, `url`, `description`, and `imageURL` are the editable application columns.
 3. THE SYSTEM SHALL have Row Level Security **disabled** and Realtime **enabled** on the `creators` table.
 4. THE SYSTEM SHALL install `@supabase/supabase-js`.
-5. THE SYSTEM SHALL export a single configured `supabase` client from `src/client.js`.
+5. THE SYSTEM SHALL export a single configured `supabase` client from `src/lib/client.js`.
 6. WHEN the client is constructed, THE SYSTEM SHALL read the project URL and anon key from environment variables and SHALL NOT commit those secrets to version control; THE SYSTEM SHALL add `.env` to `.gitignore` (ownership handed over by `01-project-setup` R5, which creates `.gitignore` but leaves the `.env` entry to this spec since `.env` is created here).
 7. THE SYSTEM SHALL seed the `creators` table with at least five complete rows (`name`, `url`, `description`; `imageURL` optional) via the Supabase table editor, satisfying the homepage's ≥5-creator requirement (owned here; consumed by `05-view-all-creators`).
 8. THE SYSTEM SHALL create the `imageURL` column with that exact mixed-case spelling. Postgres folds unquoted identifiers to lowercase, so the column must be created via the Supabase table editor (which quotes identifiers) — not via raw unquoted SQL — so query results key on `imageURL` as the app expects.
 
 ## Design
-`src/client.js`:
+`src/lib/client.js`:
 ```js
 import { createClient } from '@supabase/supabase-js'
 
