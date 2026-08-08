@@ -56,7 +56,17 @@ Record the walkthrough with LiceCap or similar (Windows: set display scaling to
 
 ## Current State
 - Core CRUD + stretch features complete (specs 01–10). [prerequisite]
-- No `README.md` or walkthrough asset exists yet. [confirmed]
+- README already exists as a rich engineering doc (TL;DR, commands, spec table,
+  map, current state). The prework submission section was appended to it per
+  user preference: `Submitted by`, Required + Stretch feature checklists, and a
+  walkthrough reference. [done]
+- Stretch checklist mapping: Card layout `[x]` and Image on card `[x]` survive
+  in the custom design system (spec 11); PicoCSS styling `[ ]` because spec 11
+  removed Pico in favor of hand-rolled tokens (`pico_applied` replaced by
+  `design_system_applied`).
+- Walkthrough asset: automated GIF via headless Chrome screenshots composed
+  with Pillow; if unavailable, the README reference stays and the recording is
+  a manual step (LiceCap). [in progress]
 
 ## Tests
 - `readme_present`: `README.md` exists at the project root.
