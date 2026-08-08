@@ -1,3 +1,8 @@
+/**
+ * AddCreator tests: field rendering, required enforcement, insert payloads
+ * (including blank-image → null), error handling, and the post-add redirect.
+ * Mocks Supabase.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -14,6 +19,10 @@ import { supabase } from '../lib/client'
 
 const store = { rows: [] }
 
+/**
+ * Builds a mocked supabase query chain that stores inserts in memory.
+ * @returns {Object} The mocked query object (select/eq/maybeSingle/insert).
+ */
 function makeChain() {
   return {
     select: vi.fn().mockResolvedValue({ data: store.rows, error: null }),
@@ -28,6 +37,10 @@ function makeChain() {
 
 let chain
 
+/**
+ * Renders AddCreator at /add.
+ * @returns {RenderResult} The render result.
+ */
 function renderAddCreator() {
   return render(
     <MemoryRouter initialEntries={['/add']}>
@@ -36,6 +49,10 @@ function renderAddCreator() {
   )
 }
 
+/**
+ * Renders the full App at /add (to exercise post-add navigation).
+ * @returns {RenderResult} The render result.
+ */
 function renderAppAtAdd() {
   return render(
     <MemoryRouter initialEntries={['/add']}>
@@ -44,6 +61,10 @@ function renderAppAtAdd() {
   )
 }
 
+/**
+ * Fills the form fields and clicks submit.
+ * @param {Object} values - Overrides for name/url/description/imageURL.
+ */
 async function fillForm({ name = 'Grace Hopper', url = 'https://grace.example', description = 'Compiler pioneer', imageURL = '' } = {}) {
   fireEvent.change(screen.getByLabelText('Name'), { target: { value: name } })
   fireEvent.change(screen.getByLabelText('URL'), { target: { value: url } })

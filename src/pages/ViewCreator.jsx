@@ -1,6 +1,15 @@
+/**
+ * ViewCreator: detail page for a single creator at /creator/:id.
+ * Uses the shared useCreator hook to load the record, then renders its full
+ * info plus an Edit link. Handles loading, not-found, and loaded states.
+ */
 import { useParams, Link } from 'react-router-dom'
 import { useCreator } from '../lib/useCreator'
 
+/**
+ * Renders a creator's full details.
+ * @returns {JSX.Element} Loading, not-found, or the creator's details.
+ */
 export default function ViewCreator() {
   const { id } = useParams()
   const { creator, loading } = useCreator(id)

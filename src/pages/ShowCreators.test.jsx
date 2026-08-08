@@ -1,3 +1,7 @@
+/**
+ * ShowCreators tests: fetch on mount, rendering all creators, empty state,
+ * and the Add button navigation. Mocks Supabase.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
@@ -19,12 +23,20 @@ const seedCreators = [
   { id: 5, name: 'Eli', url: 'https://e.example', description: 'd5', imageURL: null },
 ]
 
+/**
+ * Stubs supabase.from().select() to resolve with the given rows.
+ * @param {Array} rows - The creators to return from the mocked query.
+ */
 function mockRows(rows) {
   supabase.from.mockReturnValue({
     select: vi.fn().mockResolvedValue({ data: rows, error: null }),
   })
 }
 
+/**
+ * Renders ShowCreators without routes (for list/empty-state tests).
+ * @returns {RenderResult} The render result.
+ */
 function renderPage() {
   return render(
     <MemoryRouter>
@@ -33,6 +45,10 @@ function renderPage() {
   )
 }
 
+/**
+ * Renders ShowCreators with an /add route (for navigation tests).
+ * @returns {RenderResult} The render result.
+ */
 function renderWithRoutes() {
   return render(
     <MemoryRouter initialEntries={['/']}>
