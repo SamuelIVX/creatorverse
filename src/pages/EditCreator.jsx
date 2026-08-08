@@ -1,31 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/client'
+import { useCreator } from '../lib/useCreator'
+import CreatorForm from '../components/CreatorForm'
 
 export default function EditCreator() {
   const { id } = useParams()
+  const { creator, loading } = useCreator(id)
   const [form, setForm] = useState({ name: '', url: '', description: '', imageURL: '' })
-  const [loading, setLoading] = useState(true)
-  const [found, setFound] = useState(false)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      if (data) {
-        const { id: _id, created_at: _createdAt, ...editable } = data
-        setForm({ ...editable, imageURL: editable.imageURL ?? '' })
-        setFound(true)
-      }
-      setLoading(false)
+    if (creator) {
+      const { id: _id, created_at: _createdAt, ...editable } = creator
+      setForm({ ...editable, imageURL: editable.imageURL ?? '' })
     }
-    load()
-  }, [id])
+  }, [creator])
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -51,55 +42,20 @@ export default function EditCreator() {
   }
 
   if (loading) return <p>Loading…</p>
-  if (!found) return <p>Creator not found.</p>
+  if (!creator) return <p>Creator not found.</p>
 
   return (
     <main>
       <h1>Edit Creator</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">
-          Name
-          <input
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor="url">
-          URL
-          <input
-            id="url"
-            name="url"
-            value={form.url}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor="description">
-          Description
-          <textarea
-            id="description"
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor="imageURL">
-          Image URL (optional)
-          <input
-            id="imageURL"
-            name="imageURL"
-            value={form.imageURL}
-            onChange={handleChange}
-          />
-        </label>
-        {error && <p role="alert">{error}</p>}
-        <button type="submit">Update Creator</button>
+      <CreatorForm
+        form={form}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        submitLabel="Update Creator"
+        error={error}
+      >
         <button type="button" onClick={handleDelete}>Delete</button>
-      </form>
+      </CreatorForm>
     </main>
   )
 }

@@ -1,24 +1,9 @@
-import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { supabase } from '../lib/client'
+import { useCreator } from '../lib/useCreator'
 
 export default function ViewCreator() {
   const { id } = useParams()
-  const [creator, setCreator] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchCreator = async () => {
-      const { data } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      setCreator(data)
-      setLoading(false)
-    }
-    fetchCreator()
-  }, [id])
+  const { creator, loading } = useCreator(id)
 
   if (loading) return <p>Loading…</p>
   if (!creator) return <p>Creator not found.</p>
