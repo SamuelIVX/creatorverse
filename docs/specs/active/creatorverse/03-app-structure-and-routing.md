@@ -13,6 +13,8 @@ unique URL — the navigational backbone for all CRUD views.
 ## Non-Goals
 - No data fetching or mutations (later specs fill in behavior).
 - Pages/components render placeholder content only at this stage.
+- Pages are **not** allowed to grow into business logic: they stay thin templates
+  (composition + route params only). Logic lives in hooks, rendering in components.
 
 ## Requirements
 1. THE SYSTEM SHALL provide a `Card` component under `src/components/` accepting `id`, `name`, `url`, `description`, and `imageURL` props.
@@ -20,8 +22,15 @@ unique URL — the navigational backbone for all CRUD views.
 3. THE SYSTEM SHALL define routes mapping `/`→`ShowCreators`, `/creator/:id`→`ViewCreator`, `/add`→`AddCreator`, `/edit/:id`→`EditCreator`.
 4. WHEN a user navigates to any defined path, THE SYSTEM SHALL render the matching page element inside the `App` container.
 5. THE SYSTEM SHALL give each creator a unique URL via its unique `id` in the `/creator/:id` and `/edit/:id` paths, and SHALL expose that `id` to the page via `useParams`.
+6. THE SYSTEM SHALL keep every page a thin template: it composes components and reads route params, with no data fetching or business logic (deferred to specs 05–09).
 
 ## Design
+
+**Templates vs components:** `src/pages/` holds thin route templates — each page
+only composes components and reads route params; it must not fetch data or own
+business logic. `src/components/` holds presentational building blocks (e.g.
+`Card`) that render props. Data-fetching logic lives in hooks (later specs).
+
 Route table:
 
 | path | element |

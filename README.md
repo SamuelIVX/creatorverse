@@ -53,11 +53,13 @@ npm run preview   # preview the production build
 ## Map — where things live
 
 - `src/lib/` — third-party wrappers; `client.js` is the shared Supabase client (spec 02).
-- `src/components/` — shared reusable UI (e.g. `Card`, spec 04).
-- `src/pages/` — route-level views: `ShowCreators`, `ViewCreator`, `AddCreator`, `EditCreator`.
+- `src/components/` — presentational building blocks (e.g. `Card`, spec 04).
+- `src/pages/` — thin route templates: each page composes components and reads route params only — no data fetching or business logic (spec 03).
 - `src/main.jsx` — entry point; wraps `<App />` in `<BrowserRouter>`.
 - `src/App.jsx` — route table via `useRoutes` (implemented in spec 03).
 - `docs/specs/active/creatorverse/` — the spec chain, one file per phase.
+
+Templates vs components: pages orchestrate, components render, hooks hold logic.
 
 Tests are co-located: each `*.test.jsx` sits next to the file it tests.
 
