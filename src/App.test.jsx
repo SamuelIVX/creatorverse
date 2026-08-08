@@ -1,7 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
+
+vi.mock('./lib/client', () => ({
+  supabase: {
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockResolvedValue({ data: [], error: null }),
+    }),
+  },
+}))
 
 function renderAt(path) {
   render(
@@ -12,9 +20,9 @@ function renderAt(path) {
 }
 
 describe('routes', () => {
-  it('routes_render_pages: / renders ShowCreators', () => {
+  it('routes_render_pages: / renders ShowCreators', async () => {
     renderAt('/')
-    expect(screen.getByRole('heading', { name: /creators/i })).toBeInTheDocument()
+    expect(await screen.findByText(/no creators yet/i)).toBeInTheDocument()
   })
 
   it('routes_render_pages: /creator/:id renders ViewCreator', () => {
