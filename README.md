@@ -24,6 +24,16 @@ npm run lint      # run oxlint
 npm run preview   # preview the production build
 ```
 
+## Setup (Supabase)
+
+1. Create a Supabase project, add the `creators` table (see
+   `docs/specs/active/creatorverse/02-supabase-database.md` for the exact
+   schema), and seed ≥5 rows.
+2. `cp .env.example .env` and fill in your Project URL + anon key
+   (Settings → API). `.env` is gitignored — secrets never committed.
+3. The two database tests (`table_schema_matches`, `seed_has_five_rows`)
+   skip until `.env` has real values, then run automatically.
+
 ## Specs (dependency order)
 
 | # | Spec | One-line summary |
