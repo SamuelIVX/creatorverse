@@ -3,7 +3,7 @@
  * conditional image.
  */
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Card from './Card.jsx'
 
@@ -51,7 +51,7 @@ describe('Card', () => {
 
   it('detail_link_uses_id', () => {
     renderCard(baseProps)
-    expect(screen.getByRole('link', { name: 'View details' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Details' })).toHaveAttribute(
       'href',
       '/creator/1',
     )
@@ -75,6 +75,19 @@ describe('Card', () => {
 
   it('image_conditional: renders no image when imageURL is absent', () => {
     renderCard(baseProps)
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('image_fallback: shows initial when imageURL is absent', () => {
+    renderCard({ ...baseProps, name: 'Tech' })
+    expect(screen.getByText('T')).toBeInTheDocument()
+  })
+
+  it('image_fallback: shows initial when image fails to load', () => {
+    renderCard({ ...baseProps, imageURL: 'https://example.com/broken.jpg' })
+    const img = screen.getByRole('img')
+    fireEvent.error(img)
+    expect(screen.getByText('T')).toBeInTheDocument()
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 })

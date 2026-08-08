@@ -1,9 +1,12 @@
 /**
- * Root component: defines the app's routes and renders the matched page.
+ * Root component: defines the app's routes and renders the matched page inside
+ * the shared app shell (Layout) and ToastProvider.
  * Route → page: `/` ShowCreators, `/creator/:id` ViewCreator, `/add`
  * AddCreator, `/edit/:id` EditCreator.
  */
 import { useRoutes } from 'react-router-dom'
+import Layout from './components/Layout'
+import { ToastProvider } from './components/Toast'
 import ShowCreators from './pages/ShowCreators'
 import ViewCreator from './pages/ViewCreator'
 import AddCreator from './pages/AddCreator'
@@ -20,5 +23,9 @@ export default function App() {
     { path: '/add', element: <AddCreator /> },
     { path: '/edit/:id', element: <EditCreator /> },
   ])
-  return <div className="App">{element}</div>
+  return (
+    <ToastProvider>
+      <Layout>{element}</Layout>
+    </ToastProvider>
+  )
 }

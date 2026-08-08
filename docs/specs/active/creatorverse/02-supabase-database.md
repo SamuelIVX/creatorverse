@@ -64,7 +64,9 @@ payloads by the mutation specs (`07-add-creator`, `08-update-creator`).
   dashboard. Project `wzgfswtqkoyzjahbbrie` (ref) in org `chfloctohvpnpavhitin`,
   region `us-east-1`, free plan. `creators` table created with raw SQL using quoted
   `"imageURL"` to preserve exact case (supersedes the dashboard-editor note in R8).
-  RLS disabled, Realtime enabled. Five rows seeded via SQL. `.env` holds the real
+  RLS disabled, Realtime enabled. Five rows seeded via SQL and later swapped to
+  well-known tech YouTubers (MKBHD, ThePrimeagen, Fireship, Linus Tech Tips, Web
+  Dev Simplified) via the REST PATCH endpoint. `.env` holds the real
   URL + anon key. The live-DB tests were already in place; a test bug surfaced once
   they ran — test 1 (`client_exports_supabase`) stubbed env + `vi.resetModules()` +
   cached an `example.supabase.co`-bound client, which the DB tests then reused

@@ -65,7 +65,7 @@ Record the walkthrough with LiceCap or similar (Windows: set display scaling to
 - `checklist_matches_reality`: no feature is marked `[x]` whose owning spec's tests fail.
 
 ## Constraints
-- Dependencies: `01-project-setup` through `10-stretch-styling` (documents their delivered state; merge last).
+- Dependencies: `01-project-setup` through `11-ui-ux-overhaul` (documents their delivered state; merge last).
 - Backward compatibility: documentation only — must not alter application behavior.
 
 ## Context

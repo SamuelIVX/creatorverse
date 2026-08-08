@@ -48,7 +48,8 @@ npm run preview   # preview the production build
 | 08 | `docs/specs/active/creatorverse/08-update-creator.md` | Pre-filled edit form updates editable columns only; edit links on Card and detail page. |
 | 09 | `docs/specs/active/creatorverse/09-delete-creator.md` | Delete control on the edit page removes the creator; navigate only on success. |
 | 10 | `docs/specs/active/creatorverse/10-stretch-styling.md` | Stretch: install PicoCSS, present creators in a card grid, and show creator images. |
-| 11 | `docs/specs/active/creatorverse/11-submission-readme.md` | Package for submission: template README with feature checklist + walkthrough, push to GitHub. |
+| 11 | `docs/specs/active/creatorverse/11-ui-ux-overhaul.md` | Premium dark-studio overhaul: hand-rolled design tokens, app shell, hero + search, card/detail/form elevation, toasts, delete confirm. |
+| 12 | `docs/specs/active/creatorverse/12-submission-readme.md` | Package for submission: template README with feature checklist + walkthrough, push to GitHub. |
 
 ## Map — where things live
 
@@ -65,8 +66,9 @@ Tests are co-located: each `*.test.jsx` sits next to the file it tests.
 
 ## Current state
 
-Specs 01–09 implemented (CRUD complete): scaffold + toolchain, Supabase
-client, routes, Card, list/detail/add/update/delete. The database half of
-spec 02 (provisioning the Supabase project + seed) is pending — the app runs
-against placeholder `.env` until a real project is configured. Stretch
-styling (10) and the submission README (11) are deferred.
+Specs 01–11 implemented: scaffold + toolchain, Supabase client, routes, Card,
+list/detail/add/update/delete, PicoCSS stretch styling (10), and the UI/UX
+overhaul (11) — premium dark-studio design system, app shell, hero + search,
+skeletons, toasts, and delete confirm dialog. The database half of spec 02
+(provisioning the Supabase project + seed) is done — the app runs against a
+real project configured in `.env`. The submission README (12) is deferred.

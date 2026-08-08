@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from '../App'
+import { ToastProvider } from '../components/Toast'
 import AddCreator from './AddCreator'
 
 vi.mock('../lib/client', () => ({
@@ -43,9 +44,11 @@ let chain
  */
 function renderAddCreator() {
   return render(
-    <MemoryRouter initialEntries={['/add']}>
-      <AddCreator />
-    </MemoryRouter>,
+    <ToastProvider>
+      <MemoryRouter initialEntries={['/add']}>
+        <AddCreator />
+      </MemoryRouter>
+    </ToastProvider>,
   )
 }
 
@@ -67,7 +70,7 @@ function renderAppAtAdd() {
  */
 async function fillForm({ name = 'Grace Hopper', url = 'https://grace.example', description = 'Compiler pioneer', imageURL = '' } = {}) {
   fireEvent.change(screen.getByLabelText('Name'), { target: { value: name } })
-  fireEvent.change(screen.getByLabelText('URL'), { target: { value: url } })
+  fireEvent.change(screen.getByLabelText('Channel URL'), { target: { value: url } })
   fireEvent.change(screen.getByLabelText('Description'), { target: { value: description } })
   if (imageURL) {
     fireEvent.change(screen.getByLabelText('Image URL (optional)'), { target: { value: imageURL } })
@@ -86,7 +89,7 @@ describe('AddCreator', () => {
   it('form_has_all_fields', () => {
     renderAddCreator()
     expect(screen.getByLabelText('Name')).toBeInTheDocument()
-    expect(screen.getByLabelText('URL')).toBeInTheDocument()
+    expect(screen.getByLabelText('Channel URL')).toBeInTheDocument()
     expect(screen.getByLabelText('Description')).toBeInTheDocument()
     expect(screen.getByLabelText('Image URL (optional)')).toBeInTheDocument()
   })
@@ -94,7 +97,7 @@ describe('AddCreator', () => {
   it('required_fields_enforced', () => {
     renderAddCreator()
     expect(screen.getByLabelText('Name')).toHaveAttribute('required')
-    expect(screen.getByLabelText('URL')).toHaveAttribute('required')
+    expect(screen.getByLabelText('Channel URL')).toHaveAttribute('required')
     expect(screen.getByLabelText('Description')).toHaveAttribute('required')
     expect(screen.getByLabelText('Image URL (optional)')).not.toHaveAttribute('required')
   })
@@ -135,11 +138,26 @@ describe('AddCreator', () => {
     expect(chain.insert).toHaveBeenCalledTimes(1)
   })
 
+  it('rejected_insert_keeps_page', async () => {
+    chain.insert.mockRejectedValue(new Error('network down'))
+    renderAddCreator()
+    await fillForm()
+    expect(await screen.findByRole('alert')).toHaveTextContent('network down')
+    expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /add creator/i })).not.toBeDisabled()
+  })
+
   it('new_creator_appears', async () => {
     renderAppAtAdd()
     await fillForm({ name: 'Katherine Johnson' })
     expect(
       await screen.findByRole('heading', { name: 'Katherine Johnson' }),
     ).toBeInTheDocument()
+  })
+
+  it('toast_on_add_success', async () => {
+    renderAddCreator()
+    await fillForm({ name: 'Grace Hopper' })
+    expect(await screen.findByRole('status')).toHaveTextContent('Grace Hopper added.')
   })
 })

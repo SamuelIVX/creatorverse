@@ -3,8 +3,8 @@
  * conditional image, not-found state, and loading behavior. Mocks Supabase.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import ViewCreator from './ViewCreator'
 
 vi.mock('../lib/client', () => ({
@@ -101,6 +101,55 @@ describe('ViewCreator', () => {
     expect(screen.queryByAltText(creator.name)).not.toBeInTheDocument()
   })
 
+  it('failed_avatar_resets_for_new_url', async () => {
+    const first = { ...creator, id: '1', imageURL: 'https://bad.example/a.png' }
+    const second = { ...creator, id: '2', imageURL: 'https://good.example/b.png' }
+    let firstResolve
+    let secondResolve
+    const promises = {
+      '1': new Promise((res) => {
+        firstResolve = res
+      }),
+      '2': new Promise((res) => {
+        secondResolve = res
+      }),
+    }
+    const query = {
+      select: vi.fn(),
+      eq: vi.fn(),
+      maybeSingle: vi.fn(),
+    }
+    query.select.mockReturnValue(query)
+    query.eq.mockImplementation((_col, id) => {
+      query.maybeSingle.mockReturnValue(promises[id])
+      return query
+    })
+    supabase.from.mockReturnValue(query)
+
+    render(
+      <MemoryRouter initialEntries={['/creator/1']}>
+        <nav>
+          <Link to="/creator/2">view creator 2</Link>
+        </nav>
+        <Routes>
+          <Route path="/creator/:id" element={<ViewCreator />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    firstResolve({ data: first, error: null })
+    const badImg = await screen.findByAltText(first.name)
+    fireEvent.error(badImg)
+    expect(screen.queryByAltText(first.name)).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('link', { name: /view creator 2/i }))
+    secondResolve({ data: second, error: null })
+    expect(await screen.findByAltText(second.name)).toHaveAttribute(
+      'src',
+      second.imageURL,
+    )
+  })
+
   it('not_found_state', async () => {
     mockChain({ data: null, error: null })
     renderViewCreator('999')
@@ -130,5 +179,20 @@ describe('ViewCreator', () => {
 
     resolve({ data: creator, error: null })
     expect(await screen.findByRole('heading', { name: creator.name })).toBeInTheDocument()
+  })
+
+  it('back_button_returns_to_home', async () => {
+    mockChain({ data: creator, error: null })
+    render(
+      <MemoryRouter initialEntries={['/creator/42']}>
+        <Routes>
+          <Route path="/" element={<p>HOME PAGE</p>} />
+          <Route path="/creator/:id" element={<ViewCreator />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByRole('heading', { name: creator.name })
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
   })
 })
