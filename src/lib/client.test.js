@@ -3,7 +3,7 @@
  * that .env is git-ignored, and (when real env is set) that the live database
  * schema matches the spec.
  */
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { execFileSync } from 'node:child_process'
 
 /**
@@ -37,6 +37,10 @@ describe('client', () => {
 })
 
 describe.skipIf(!hasEnv)('supabase database', () => {
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
   it('table_schema_matches', async () => {
     const { supabase } = await import('./client.js')
     const { data, error } = await supabase
