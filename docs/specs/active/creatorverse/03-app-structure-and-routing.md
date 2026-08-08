@@ -8,7 +8,7 @@ unique URL — the navigational backbone for all CRUD views.
 ## Scope
 - Package: `creatorverse`
 - Modifies: `src/App.jsx`, `src/components/Card.jsx` (new), `src/pages/*.jsx` (new)
-- Off-limits: `src/client.js`, `src/main.jsx` (owned by specs 01–02)
+- Off-limits: `src/lib/client.js`, `src/main.jsx` (owned by specs 01–02)
 
 ## Non-Goals
 - No data fetching or mutations (later specs fill in behavior).
