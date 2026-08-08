@@ -24,17 +24,23 @@ const creatorWithNullImage = {
   imageURL: null,
 }
 
-function mockChain(data, { updateError = null } = {}) {
+const store = { rows: [] }
+
+function mockChain(data, { updateError = null, deleteError = null } = {}) {
   const query = {
-    select: vi.fn(),
+    select: vi.fn().mockResolvedValue({ data: store.rows, error: null }),
     eq: vi.fn(),
     maybeSingle: vi.fn().mockResolvedValue({ data, error: null }),
     update: vi.fn(),
+    delete: vi.fn(),
   }
   query.select.mockReturnValue(query)
   query.eq.mockReturnValue(query)
   query.update.mockReturnValue({
     eq: vi.fn().mockResolvedValue({ error: updateError }),
+  })
+  query.delete.mockReturnValue({
+    eq: vi.fn().mockResolvedValue({ error: deleteError }),
   })
   supabase.from.mockReturnValue(query)
   return query
@@ -53,6 +59,7 @@ function renderEditCreator(id = creator.id) {
 describe('EditCreator', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    store.rows = []
   })
 
   it('loads_existing_values', async () => {
@@ -134,5 +141,88 @@ describe('EditCreator', () => {
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('update failed')
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+  })
+
+  it('delete_button_present', async () => {
+    mockChain(creator)
+    renderEditCreator()
+    await screen.findByLabelText('Name')
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
+  })
+
+  it('click_deletes_row', async () => {
+    const query = mockChain(creator)
+    renderEditCreator()
+    await screen.findByLabelText('Name')
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(query.delete).toHaveBeenCalled()
+    const deleteEq = query.delete.mock.results[0].value.eq
+    expect(deleteEq).toHaveBeenCalledWith('id', '42')
+  })
+
+  it('error_keeps_page_on_delete', async () => {
+    mockChain(creator, { deleteError: new Error('delete failed') })
+    renderEditCreator()
+    await screen.findByLabelText('Name')
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('delete failed')
+    expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+  })
+
+  it('redirects_home_after_delete', async () => {
+    store.rows.push({ ...creator })
+    const query = mockChain(creator)
+    query.delete.mockReturnValue({
+      eq: vi.fn().mockImplementation(async (col, value) => {
+        store.rows = store.rows.filter((row) => row[col] !== value)
+        return { error: null }
+      }),
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/edit/42']}>
+        <Routes>
+          <Route path="/edit/:id" element={<EditCreator />} />
+          <Route path="/" element={<p>HOME PAGE</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await screen.findByLabelText('Name')
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+  })
+
+  it('creator_gone_from_list', async () => {
+    store.rows.push({ ...creator })
+    store.rows.push({
+      id: '43',
+      name: 'Katherine Johnson',
+      url: 'https://k.example',
+      description: 'Mathmatician',
+      imageURL: null,
+    })
+    const query = mockChain(creator)
+    query.delete.mockReturnValue({
+      eq: vi.fn().mockImplementation(async (col, value) => {
+        store.rows = store.rows.filter((row) => row[col] !== value)
+        return { error: null }
+      }),
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/edit/42']}>
+        <Routes>
+          <Route path="/edit/:id" element={<EditCreator />} />
+          <Route path="/" element={<p>HOME PAGE</p>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await screen.findByLabelText('Name')
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+    expect(store.rows.map((row) => row.id)).toEqual(['43'])
+    expect(store.rows.map((row) => row.name)).not.toContain('Ada Lovelace')
   })
 })
