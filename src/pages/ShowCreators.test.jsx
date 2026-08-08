@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ShowCreators from './ShowCreators'
 
 vi.mock('../lib/client', () => ({
@@ -33,6 +33,17 @@ function renderPage() {
   )
 }
 
+function renderWithRoutes() {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route path="/" element={<ShowCreators />} />
+        <Route path="/add" element={<p>ADD PAGE</p>} />
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
 describe('ShowCreators', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -60,5 +71,12 @@ describe('ShowCreators', () => {
     renderPage()
     expect(await screen.findByText(/no creators yet — add one/i)).toBeInTheDocument()
     expect(screen.queryAllByRole('article')).toHaveLength(0)
+  })
+
+  it('nav_button_routes_to_add', async () => {
+    mockRows([])
+    renderWithRoutes()
+    fireEvent.click(screen.getByRole('button', { name: /add creator/i }))
+    expect(await screen.findByText('ADD PAGE')).toBeInTheDocument()
   })
 })
