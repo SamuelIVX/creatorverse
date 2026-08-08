@@ -74,6 +74,10 @@ describe('ViewCreator', () => {
     expect(link).toHaveAttribute('rel', 'noreferrer')
     const image = screen.getByAltText(creator.name)
     expect(image).toHaveAttribute('src', creator.imageURL)
+    expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      `/edit/${creator.id}`,
+    )
   })
 
   it('hides_image_when_absent', async () => {
