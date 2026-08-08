@@ -15,12 +15,16 @@
   --border-strong: #3a3a4a;
   --text: #f4f4f6;
   --text-muted: #9b9baa;
-  --text-faint: #6b6b7a;
+  --text-faint: #8b8b9a;
   --color-accent: #8b5cf6;
+  --color-accent-bright: #a78bfa;
+  --color-accent-hover: #b39cfb;
   --color-accent-strong: #7c3aed;
+  --color-accent-deep: #6d28d9;
   --color-accent-soft: rgba(139, 92, 246, 0.14);
   --color-success: #34d399;
   --color-danger: #f87171;
+  --color-danger-strong: #dc2626;
   --gradient-accent: linear-gradient(135deg, #8b5cf6, #6366f1);
 
   /* Type scale */

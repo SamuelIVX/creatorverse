@@ -36,14 +36,14 @@
 }
 
 .btn-primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-accent-strong);
+  border-color: var(--color-accent-strong);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: var(--color-accent-strong);
-  border-color: var(--color-accent-strong);
+  background: var(--color-accent-deep);
+  border-color: var(--color-accent-deep);
   box-shadow: var(--shadow-accent);
 }
 
@@ -54,7 +54,7 @@
 }
 
 .btn-danger:hover {
-  background: var(--color-danger);
+  background: var(--color-danger-strong);
   color: #fff;
 }
 
