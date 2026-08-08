@@ -48,7 +48,8 @@ npm run preview   # preview the production build
 | 08 | `docs/specs/active/creatorverse/08-update-creator.md` | Pre-filled edit form updates editable columns only; edit links on Card and detail page. |
 | 09 | `docs/specs/active/creatorverse/09-delete-creator.md` | Delete control on the edit page removes the creator; navigate only on success. |
 | 10 | `docs/specs/active/creatorverse/10-stretch-styling.md` | Stretch: install PicoCSS, present creators in a card grid, and show creator images. |
-| 11 | `docs/specs/active/creatorverse/11-submission-readme.md` | Package for submission: template README with feature checklist + walkthrough, push to GitHub. |
+| 11 | `docs/specs/active/creatorverse/11-ui-ux-overhaul.md` | Premium dark-studio overhaul: hand-rolled design tokens, app shell, hero + search, card/detail/form elevation, toasts, delete confirm. |
+| 12 | `docs/specs/active/creatorverse/12-submission-readme.md` | Package for submission: template README with feature checklist + walkthrough, push to GitHub. |
 
 ## Map — where things live
 

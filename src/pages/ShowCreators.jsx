@@ -1,41 +1,105 @@
 /**
  * ShowCreators: the homepage. Fetches all creators from Supabase on mount and
- * renders a Card per creator, or an empty-state message. Links to /add.
+ * renders a hero, a client-side search box, and a Card per matching creator
+ * (or skeletons while loading / empty and no-results states).
  */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import Card from '../components/Card'
+import SkeletonCard from '../components/SkeletonCard'
 
 /**
  * Renders the list of creators.
- * @returns {JSX.Element} The homepage with the add link and card list.
+ * @returns {JSX.Element} The homepage with hero, search, and card list.
  */
 export default function ShowCreators() {
-  const [creators, setCreators] = useState([])
+  const [creators, setCreators] = useState(null)
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
+    let cancelled = false
     const fetchCreators = async () => {
       const { data } = await supabase.from('creators').select('*')
-      setCreators(data ?? [])
+      if (!cancelled) setCreators(data ?? [])
     }
     fetchCreators()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
+  const normalized = query.trim().toLowerCase()
+  const visible =
+    creators === null
+      ? null
+      : creators.filter((creator) =>
+          [creator.name, creator.description]
+            .join(' ')
+            .toLowerCase()
+            .includes(normalized),
+        )
+
   return (
-    <main>
-      <Link to="/add">
-        <button type="button">Add Creator</button>
-      </Link>
-      {creators.length === 0 ? (
-        <p>No creators yet — add one!</p>
+    <div className="container">
+      <section className="hero">
+        <h1 className="hero-title">The creators worth following</h1>
+        <p className="hero-subtitle">
+          A hand-curated roster of builders, streamers, and educators — one
+          place to keep the channels that actually deliver.
+        </p>
+        <div className="hero-actions">
+          <Link to="/add" className="btn btn-primary">
+            Add a creator
+          </Link>
+        </div>
+        <div className="search">
+          <div className="search-wrap">
+            <span className="search-icon" aria-hidden="true">
+              ⌕
+            </span>
+            <label htmlFor="creator-search" className="sr-only">
+              Search creators
+            </label>
+            <input
+              id="creator-search"
+              className="search-input"
+              type="search"
+              placeholder="Search by name or description…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </section>
+
+      {visible === null ? (
+        <div className="creator-grid" aria-busy="true">
+          {Array.from({ length: 6 }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : visible.length === 0 ? (
+        <div className="state-box" role="status">
+          {creators.length === 0 ? (
+            <>
+              <h2 className="state-title">No creators yet — add one!</h2>
+              <p>Be the first to add a creator worth following.</p>
+            </>
+          ) : (
+            <>
+              <h2 className="state-title">No matches</h2>
+              <p>Nothing matches "{query}". Try another search.</p>
+            </>
+          )}
+        </div>
       ) : (
         <div className="creator-grid">
-          {creators.map((creator) => (
+          {visible.map((creator) => (
             <Card key={creator.id} {...creator} />
           ))}
         </div>
       )}
-    </main>
+    </div>
   )
 }

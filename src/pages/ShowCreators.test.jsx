@@ -106,10 +106,39 @@ describe('ShowCreators', () => {
     expect(img).toHaveClass('card-image')
   })
 
-  it('nav_button_routes_to_add', async () => {
+  it('nav_link_routes_to_add', async () => {
     mockRows([])
     renderWithRoutes()
-    fireEvent.click(screen.getByRole('button', { name: /add creator/i }))
+    fireEvent.click(screen.getByRole('link', { name: /add a creator/i }))
     expect(await screen.findByText('ADD PAGE')).toBeInTheDocument()
+  })
+
+  it('homepage_search_filters', async () => {
+    mockRows(seedCreators)
+    renderPage()
+    await screen.findByRole('heading', { name: /alice/i })
+    fireEvent.change(screen.getByLabelText(/search creators/i), {
+      target: { value: 'bob' },
+    })
+    expect(screen.getByRole('heading', { name: 'Bob' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Alice' })).not.toBeInTheDocument()
+  })
+
+  it('search_no_results_message', async () => {
+    mockRows(seedCreators)
+    renderPage()
+    await screen.findByRole('heading', { name: /alice/i })
+    fireEvent.change(screen.getByLabelText(/search creators/i), {
+      target: { value: 'zzz-no-match' },
+    })
+    expect(await screen.findByText(/no matches/i)).toBeInTheDocument()
+  })
+
+  it('skeleton_shown_while_loading', () => {
+    supabase.from.mockReturnValue({
+      select: vi.fn().mockReturnValue(new Promise(() => {})),
+    })
+    renderPage()
+    expect(document.querySelector('.skeleton-card')).toBeInTheDocument()
   })
 })

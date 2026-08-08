@@ -4,8 +4,9 @@
  * and post-delete navigation. Mocks Supabase.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { ToastProvider } from '../components/Toast'
 import EditCreator from './EditCreator'
 
 vi.mock('../lib/client', () => ({
@@ -66,11 +67,13 @@ function mockChain(data, { updateError = null, deleteError = null } = {}) {
  */
 function renderEditCreator(id = creator.id) {
   return render(
-    <MemoryRouter initialEntries={[`/edit/${id}`]}>
-      <Routes>
-        <Route path="/edit/:id" element={<EditCreator />} />
-      </Routes>
-    </MemoryRouter>,
+    <ToastProvider>
+      <MemoryRouter initialEntries={[`/edit/${id}`]}>
+        <Routes>
+          <Route path="/edit/:id" element={<EditCreator />} />
+        </Routes>
+      </MemoryRouter>
+    </ToastProvider>,
   )
 }
 
@@ -94,7 +97,7 @@ describe('EditCreator', () => {
     renderEditCreator()
     const nameInput = await waitForPrefill()
     expect(nameInput).toHaveValue(creator.name)
-    expect(screen.getByLabelText('URL')).toHaveValue(creator.url)
+    expect(screen.getByLabelText('Channel URL')).toHaveValue(creator.url)
     expect(screen.getByLabelText('Description')).toHaveValue(creator.description)
     expect(screen.getByLabelText('Image URL (optional)')).toHaveValue(creator.imageURL)
   })
@@ -119,7 +122,7 @@ describe('EditCreator', () => {
     renderEditCreator()
     await waitForPrefill()
     expect(screen.getByLabelText('Name')).toHaveAttribute('required')
-    expect(screen.getByLabelText('URL')).toHaveAttribute('required')
+    expect(screen.getByLabelText('Channel URL')).toHaveAttribute('required')
     expect(screen.getByLabelText('Description')).toHaveAttribute('required')
     expect(screen.getByLabelText('Image URL (optional)')).not.toHaveAttribute('required')
   })
@@ -183,9 +186,22 @@ describe('EditCreator', () => {
     renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    const dialog = screen.getByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: /delete/i }))
     expect(query.delete).toHaveBeenCalled()
     const deleteEq = query.delete.mock.results[0].value.eq
     expect(deleteEq).toHaveBeenCalledWith('id', '42')
+  })
+
+  it('cancel_does_not_delete', async () => {
+    const query = mockChain(creator)
+    renderEditCreator()
+    await waitForPrefill()
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    const dialog = screen.getByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: /cancel/i }))
+    expect(query.delete).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('error_keeps_page_on_delete', async () => {
@@ -193,6 +209,7 @@ describe('EditCreator', () => {
     renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('delete failed')
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
   })
@@ -208,16 +225,19 @@ describe('EditCreator', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/edit/42']}>
-        <Routes>
-          <Route path="/edit/:id" element={<EditCreator />} />
-          <Route path="/" element={<p>HOME PAGE</p>} />
-        </Routes>
-      </MemoryRouter>,
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+            <Route path="/" element={<p>HOME PAGE</p>} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
     )
 
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
   })
 
@@ -239,16 +259,19 @@ describe('EditCreator', () => {
     })
 
     render(
-      <MemoryRouter initialEntries={['/edit/42']}>
-        <Routes>
-          <Route path="/edit/:id" element={<EditCreator />} />
-          <Route path="/" element={<p>HOME PAGE</p>} />
-        </Routes>
-      </MemoryRouter>,
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+            <Route path="/" element={<p>HOME PAGE</p>} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
     )
 
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
     expect(store.rows.map((row) => row.id)).toEqual(['43'])
     expect(store.rows.map((row) => row.name)).not.toContain('Ada Lovelace')
