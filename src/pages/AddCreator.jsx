@@ -27,16 +27,22 @@ export default function AddCreator() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    const payload = { ...form, imageURL: form.imageURL || null }
-    const { error } = await supabase.from('creators').insert(payload)
-    setSubmitting(false)
-    if (error) {
-      setError(error.message)
+    try {
+      const payload = { ...form, imageURL: form.imageURL || null }
+      const { error } = await supabase.from('creators').insert(payload)
+      if (error) {
+        setError(error.message)
+        pushToast('Could not add creator.', 'error')
+        return
+      }
+      pushToast(`${form.name} added.`)
+      navigate('/')
+    } catch (err) {
+      setError(err.message)
       pushToast('Could not add creator.', 'error')
-      return
+    } finally {
+      setSubmitting(false)
     }
-    pushToast(`${form.name} added.`)
-    navigate('/')
   }
 
   return (

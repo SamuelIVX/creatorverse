@@ -21,6 +21,7 @@ export default function EditCreator() {
   const [form, setForm] = useState({ name: '', url: '', description: '', imageURL: '' })
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const navigate = useNavigate()
   const pushToast = useToast()
@@ -39,28 +40,43 @@ export default function EditCreator() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    const payload = { ...form, imageURL: form.imageURL || null }
-    const { error } = await supabase.from('creators').update(payload).eq('id', id)
-    setSubmitting(false)
-    if (error) {
-      setError(error.message)
+    try {
+      const payload = { ...form, imageURL: form.imageURL || null }
+      const { error } = await supabase.from('creators').update(payload).eq('id', id)
+      if (error) {
+        setError(error.message)
+        pushToast('Could not update creator.', 'error')
+        return
+      }
+      pushToast(`${form.name} updated.`)
+      navigate(`/creator/${id}`)
+    } catch (err) {
+      setError(err.message)
       pushToast('Could not update creator.', 'error')
-      return
+    } finally {
+      setSubmitting(false)
     }
-    pushToast(`${form.name} updated.`)
-    navigate(`/creator/${id}`)
   }
 
   const handleDelete = async () => {
-    setConfirmOpen(false)
-    const { error } = await supabase.from('creators').delete().eq('id', id)
-    if (error) {
-      setError(error.message)
+    setDeleting(true)
+    try {
+      const { error } = await supabase.from('creators').delete().eq('id', id)
+      if (error) {
+        setConfirmOpen(false)
+        setError(error.message)
+        pushToast('Could not delete creator.', 'error')
+        return
+      }
+      pushToast('Creator deleted.')
+      navigate('/')
+    } catch (err) {
+      setConfirmOpen(false)
+      setError(err.message)
       pushToast('Could not delete creator.', 'error')
-      return
+    } finally {
+      setDeleting(false)
     }
-    pushToast('Creator deleted.')
-    navigate('/')
   }
 
   if (loading) return <p>Loading…</p>
@@ -83,8 +99,9 @@ export default function EditCreator() {
           type="button"
           className="btn btn-danger"
           onClick={() => setConfirmOpen(true)}
+          disabled={deleting}
         >
-          Delete
+          {deleting ? 'Deleting…' : 'Delete'}
         </button>
       </CreatorForm>
       <ConfirmDialog
@@ -92,6 +109,7 @@ export default function EditCreator() {
         title="Delete this creator?"
         message={`"${creator.name}" will be permanently removed. This cannot be undone.`}
         confirmLabel="Delete"
+        disabled={deleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmOpen(false)}
       />

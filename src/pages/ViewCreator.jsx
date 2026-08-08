@@ -15,12 +15,12 @@ import { useCreator } from '../lib/useCreator'
 export default function ViewCreator() {
   const { id } = useParams()
   const { creator, loading } = useCreator(id)
-  const [imgFailed, setImgFailed] = useState(false)
+  const [failedImageURL, setFailedImageURL] = useState(null)
 
   if (loading) return <p>Loading…</p>
   if (!creator) return <p>Creator not found.</p>
 
-  const showImage = creator.imageURL && !imgFailed
+  const showImage = creator.imageURL && failedImageURL !== creator.imageURL
 
   return (
     <div className="container">
@@ -32,7 +32,7 @@ export default function ViewCreator() {
               className="profile-avatar"
               src={creator.imageURL}
               alt={creator.name}
-              onError={() => setImgFailed(true)}
+              onError={() => setFailedImageURL(creator.imageURL)}
             />
           ) : (
             <div

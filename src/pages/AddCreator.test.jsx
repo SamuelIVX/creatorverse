@@ -138,6 +138,15 @@ describe('AddCreator', () => {
     expect(chain.insert).toHaveBeenCalledTimes(1)
   })
 
+  it('rejected_insert_keeps_page', async () => {
+    chain.insert.mockRejectedValue(new Error('network down'))
+    renderAddCreator()
+    await fillForm()
+    expect(await screen.findByRole('alert')).toHaveTextContent('network down')
+    expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /add creator/i })).not.toBeDisabled()
+  })
+
   it('new_creator_appears', async () => {
     renderAppAtAdd()
     await fillForm({ name: 'Katherine Johnson' })

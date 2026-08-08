@@ -66,8 +66,9 @@ Tests are co-located: each `*.test.jsx` sits next to the file it tests.
 
 ## Current state
 
-Specs 01–09 implemented (CRUD complete): scaffold + toolchain, Supabase
-client, routes, Card, list/detail/add/update/delete. The database half of
-spec 02 (provisioning the Supabase project + seed) is pending — the app runs
-against placeholder `.env` until a real project is configured. Stretch
-styling (10) and the submission README (11) are deferred.
+Specs 01–11 implemented: scaffold + toolchain, Supabase client, routes, Card,
+list/detail/add/update/delete, PicoCSS stretch styling (10), and the UI/UX
+overhaul (11) — premium dark-studio design system, app shell, hero + search,
+skeletons, toasts, and delete confirm dialog. The database half of spec 02
+(provisioning the Supabase project + seed) is done — the app runs against a
+real project configured in `.env`. The submission README (12) is deferred.

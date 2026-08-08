@@ -174,6 +174,19 @@ describe('EditCreator', () => {
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
   })
 
+  it('rejected_update_keeps_page', async () => {
+    const query = mockChain(creator)
+    query.update.mockReturnValue({
+      eq: vi.fn().mockRejectedValue(new Error('network down')),
+    })
+    renderEditCreator()
+    await waitForPrefill()
+    fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('network down')
+    expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /update creator/i })).not.toBeDisabled()
+  })
+
   it('delete_button_present', async () => {
     mockChain(creator)
     renderEditCreator()
@@ -212,6 +225,20 @@ describe('EditCreator', () => {
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('delete failed')
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+  })
+
+  it('rejected_delete_keeps_page', async () => {
+    const query = mockChain(creator)
+    query.delete.mockReturnValue({
+      eq: vi.fn().mockRejectedValue(new Error('network down')),
+    })
+    renderEditCreator()
+    await waitForPrefill()
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('network down')
+    expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /delete/i })).not.toBeDisabled()
   })
 
   it('redirects_home_after_delete', async () => {

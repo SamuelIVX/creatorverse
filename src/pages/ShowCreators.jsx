@@ -15,13 +15,17 @@ import SkeletonCard from '../components/SkeletonCard'
  */
 export default function ShowCreators() {
   const [creators, setCreators] = useState(null)
+  const [loadError, setLoadError] = useState(null)
   const [query, setQuery] = useState('')
 
   useEffect(() => {
     let cancelled = false
     const fetchCreators = async () => {
-      const { data } = await supabase.from('creators').select('*')
-      if (!cancelled) setCreators(data ?? [])
+      const { data, error } = await supabase.from('creators').select('*')
+      if (!cancelled) {
+        setLoadError(error)
+        setCreators(error ? [] : (data ?? []))
+      }
     }
     fetchCreators()
     return () => {
@@ -78,6 +82,11 @@ export default function ShowCreators() {
           {Array.from({ length: 6 }, (_, i) => (
             <SkeletonCard key={i} />
           ))}
+        </div>
+      ) : loadError ? (
+        <div className="state-box" role="alert">
+          <h2 className="state-title">Couldn't load creators</h2>
+          <p>Something went wrong reaching the database. Please try again.</p>
         </div>
       ) : visible.length === 0 ? (
         <div className="state-box" role="status">

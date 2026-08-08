@@ -89,6 +89,15 @@ describe('ShowCreators', () => {
     expect(screen.queryAllByRole('article')).toHaveLength(0)
   })
 
+  it('query_error_shows_failure_state', async () => {
+    supabase.from.mockReturnValue({
+      select: vi.fn().mockResolvedValue({ data: null, error: new Error('db down') }),
+    })
+    renderPage()
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load creators")
+    expect(screen.queryByText(/no creators yet/i)).not.toBeInTheDocument()
+  })
+
   it('homepage_uses_grid', async () => {
     mockRows(seedCreators)
     renderPage()

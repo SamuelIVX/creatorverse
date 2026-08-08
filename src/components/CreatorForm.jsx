@@ -84,7 +84,12 @@ export default function CreatorForm({
         />
         <div className="image-preview">
           {form.imageURL ? (
-            <img src={form.imageURL} alt="" onError={(e) => (e.target.style.display = 'none')} />
+            <img
+              key={form.imageURL}
+              src={form.imageURL}
+              alt=""
+              onError={(e) => (e.target.style.display = 'none')}
+            />
           ) : (
             <div className="image-preview-empty">No image preview</div>
           )}

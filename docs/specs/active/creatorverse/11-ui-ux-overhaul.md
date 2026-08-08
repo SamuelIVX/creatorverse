@@ -16,10 +16,12 @@ delete-confirmation dialog. All existing behavior and tests stay intact.
   `src/App.test.jsx`, `src/components/Card.test.jsx`,
   `src/pages/ShowCreators.test.jsx`, `package.json`, `README.md`
 - New: `src/components/Layout.jsx`, `src/components/Toast.jsx`,
+  `src/components/ToastContext.js`, `src/lib/useToast.js`,
   `src/components/ConfirmDialog.jsx`, `src/components/SkeletonCard.jsx`,
   `src/styles/tokens.css`, `src/styles/base.css`, `src/styles/components.css`
 - Removed: `@picocss/pico` dependency + its imports
-- Off-limits: `src/lib/*` (client, useCreator), Supabase schema, feature behavior
+- Off-limits: `src/lib/client.js`, `src/lib/useCreator.js`, Supabase schema,
+  feature behavior (the new `src/lib/useToast.js` is in-scope)
 
 ## Non-Goals
 - No new backend features, no schema changes, no search in the database
@@ -91,8 +93,10 @@ Context-backed `ToastProvider` + `useToast()` hook. Renders stacked toasts,
 each auto-dismissing after a delay with a success/error variant.
 
 ### ConfirmDialog (`src/components/ConfirmDialog.jsx`)
-Controlled modal (`<dialog open>` or overlay) with title, message, Cancel, and
-Confirm (danger-styled) buttons. Focuses the confirm button on open.
+Controlled native `<dialog>` opened with `showModal()` (falling back to the
+`open` attribute where unsupported), with title, message, Cancel, and Confirm
+(danger-styled) buttons. The native dialog traps focus, dismisses on Escape, and
+restores focus to the previously focused element.
 
 ## Current State
 - PicoCSS v2 default styling with a small custom layer (`.creator-grid`,
@@ -112,6 +116,16 @@ Confirm (danger-styled) buttons. Focuses the confirm button on open.
   — `Channel URL` label, `Details` card link, link-based add nav — plus new
   tests: search filter, no-results, skeleton, toast, confirm-cancel, image
   fallbacks, design-system load).
+- **Post-review hardening (CodeRabbit PR #13):** `ConfirmDialog` uses a native
+  `<dialog>` opened via `showModal()` (feature-detected with an `open`-attribute
+  fallback for jsdom) for focus trapping, Escape dismissal, and focus
+  restoration. Form image previews are keyed by URL so a failed image doesn't
+  stay hidden across URL changes. Add/Edit wrap submits in `try/catch/finally`
+  so a rejected Supabase request clears `submitting`; delete tracks in-flight
+  state and disables both dialog buttons during it. `ShowCreators` tracks query
+  errors and renders a distinct failure state (not the empty state). The detail
+  avatar failure state is keyed by URL so a reused route instance shows a new
+  creator's valid image. 67 tests pass.
 
 ## Tests
 - `design_system_applied` (replaces `pico_applied`): a loaded `<style>` tag
