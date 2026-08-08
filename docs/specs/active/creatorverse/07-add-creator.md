@@ -50,6 +50,8 @@ export default function AddCreator() {
 ```
 Homepage gains: `<Link to="/add"><button>Add Creator</button></Link>`.
 
+> **Implementation note (refactor):** the four-field form is extracted into the shared `CreatorForm` component in `src/components/CreatorForm.jsx` (also used by `EditCreator`), per the DRY cleanup. The fields, required flags, `imageURL`-optional handling, submit button, and error surface below are unchanged in behavior.
+
 ## Current State
 - `AddCreator` renders placeholder content from spec 03. [confirmed]
 - `/add` route defined. [confirmed — spec 03]

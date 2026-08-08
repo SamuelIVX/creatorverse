@@ -56,6 +56,10 @@ function renderEditCreator(id = creator.id) {
   )
 }
 
+async function waitForPrefill(name = creator.name) {
+  return screen.findByDisplayValue(name)
+}
+
 describe('EditCreator', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -65,7 +69,7 @@ describe('EditCreator', () => {
   it('loads_existing_values', async () => {
     mockChain(creator)
     renderEditCreator()
-    const nameInput = await screen.findByLabelText('Name')
+    const nameInput = await waitForPrefill()
     expect(nameInput).toHaveValue(creator.name)
     expect(screen.getByLabelText('URL')).toHaveValue(creator.url)
     expect(screen.getByLabelText('Description')).toHaveValue(creator.description)
@@ -75,7 +79,8 @@ describe('EditCreator', () => {
   it('coerces_null_image_to_empty', async () => {
     mockChain(creatorWithNullImage)
     renderEditCreator()
-    const imageInput = await screen.findByLabelText('Image URL (optional)')
+    await waitForPrefill()
+    const imageInput = screen.getByLabelText('Image URL (optional)')
     expect(imageInput).toHaveValue('')
   })
 
@@ -89,7 +94,7 @@ describe('EditCreator', () => {
   it('required_fields_enforced', async () => {
     mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     expect(screen.getByLabelText('Name')).toHaveAttribute('required')
     expect(screen.getByLabelText('URL')).toHaveAttribute('required')
     expect(screen.getByLabelText('Description')).toHaveAttribute('required')
@@ -99,7 +104,7 @@ describe('EditCreator', () => {
   it('submit_updates_row', async () => {
     const query = mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ada King' } })
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(query.update).toHaveBeenCalledWith({
@@ -115,7 +120,7 @@ describe('EditCreator', () => {
   it('update_payload_excludes_system_columns', async () => {
     const query = mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     const payload = query.update.mock.calls[0][0]
     expect(Object.keys(payload).sort()).toEqual(
@@ -126,7 +131,7 @@ describe('EditCreator', () => {
   it('blank_image_updates_null', async () => {
     const query = mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.change(screen.getByLabelText('Image URL (optional)'), { target: { value: '' } })
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(query.update).toHaveBeenCalledWith(
@@ -137,7 +142,7 @@ describe('EditCreator', () => {
   it('error_keeps_page', async () => {
     mockChain(creator, { updateError: new Error('update failed') })
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('update failed')
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
@@ -146,14 +151,14 @@ describe('EditCreator', () => {
   it('delete_button_present', async () => {
     mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
   })
 
   it('click_deletes_row', async () => {
     const query = mockChain(creator)
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(query.delete).toHaveBeenCalled()
     const deleteEq = query.delete.mock.results[0].value.eq
@@ -163,7 +168,7 @@ describe('EditCreator', () => {
   it('error_keeps_page_on_delete', async () => {
     mockChain(creator, { deleteError: new Error('delete failed') })
     renderEditCreator()
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('delete failed')
     expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
@@ -188,7 +193,7 @@ describe('EditCreator', () => {
       </MemoryRouter>,
     )
 
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
   })
@@ -219,7 +224,7 @@ describe('EditCreator', () => {
       </MemoryRouter>,
     )
 
-    await screen.findByLabelText('Name')
+    await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
     expect(store.rows.map((row) => row.id)).toEqual(['43'])
