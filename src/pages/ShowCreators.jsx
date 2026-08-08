@@ -1,8 +1,16 @@
+/**
+ * ShowCreators: the homepage. Fetches all creators from Supabase on mount and
+ * renders a Card per creator, or an empty-state message. Links to /add.
+ */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import Card from '../components/Card'
 
+/**
+ * Renders the list of creators.
+ * @returns {JSX.Element} The homepage with the add link and card list.
+ */
 export default function ShowCreators() {
   const [creators, setCreators] = useState([])
 

@@ -1,3 +1,8 @@
+/**
+ * EditCreator tests: pre-fill from the fetched creator, null-image coercion,
+ * not-found state, required fields, update/delete payloads, error handling,
+ * and post-delete navigation. Mocks Supabase.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
@@ -26,6 +31,14 @@ const creatorWithNullImage = {
 
 const store = { rows: [] }
 
+/**
+ * Builds a mocked supabase query chain with configurable update/delete errors.
+ * @param {Object} data - The creator to resolve from maybeSingle.
+ * @param {Object} options
+ * @param {Error|null} options.updateError - Error for update, if any.
+ * @param {Error|null} options.deleteError - Error for delete, if any.
+ * @returns {Object} The mocked query object.
+ */
 function mockChain(data, { updateError = null, deleteError = null } = {}) {
   const query = {
     select: vi.fn().mockResolvedValue({ data: store.rows, error: null }),
@@ -46,6 +59,11 @@ function mockChain(data, { updateError = null, deleteError = null } = {}) {
   return query
 }
 
+/**
+ * Renders EditCreator at /edit/:id.
+ * @param {string} id - The creator id for the route.
+ * @returns {RenderResult} The render result.
+ */
 function renderEditCreator(id = creator.id) {
   return render(
     <MemoryRouter initialEntries={[`/edit/${id}`]}>
@@ -56,6 +74,11 @@ function renderEditCreator(id = creator.id) {
   )
 }
 
+/**
+ * Waits for the form to pre-fill with the given creator name.
+ * @param {string} name - The expected pre-filled name value.
+ * @returns {Promise<HTMLElement>} The resolved name input.
+ */
 async function waitForPrefill(name = creator.name) {
   return screen.findByDisplayValue(name)
 }

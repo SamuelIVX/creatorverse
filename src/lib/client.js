@@ -1,3 +1,9 @@
+/**
+ * Supabase client singleton for the creatorverse app.
+ * Reads VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY from env at module load.
+ * The anon key is a public client key by design — access is enforced by
+ * Supabase row-level security policies, not by key secrecy.
+ */
 import { createClient } from '@supabase/supabase-js'
 
 const URL = import.meta.env.VITE_SUPABASE_URL

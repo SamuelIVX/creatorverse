@@ -1,8 +1,16 @@
+/**
+ * Card component tests: props rendering, links (channel/detail/edit), and the
+ * conditional image.
+ */
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Card from './Card.jsx'
 
+/**
+ * Renders a Card inside a router.
+ * @param {Object} props - Props passed to Card (id, name, url, description, imageURL).
+ */
 function renderCard(props) {
   return render(
     <MemoryRouter>

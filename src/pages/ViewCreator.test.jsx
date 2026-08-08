@@ -1,3 +1,7 @@
+/**
+ * ViewCreator tests: id param read, single-creator fetch, field rendering,
+ * conditional image, not-found state, and loading behavior. Mocks Supabase.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
@@ -19,6 +23,11 @@ const creator = {
   imageURL: 'https://ada.example/portrait.png',
 }
 
+/**
+ * Stubs the supabase query chain to resolve with the given result.
+ * @param {Object} result - { data, error } to resolve from maybeSingle.
+ * @returns {Object} The mocked query object.
+ */
 function mockChain(result) {
   const query = {
     select: vi.fn(),
@@ -31,6 +40,11 @@ function mockChain(result) {
   return query
 }
 
+/**
+ * Renders ViewCreator at /creator/:id.
+ * @param {string} id - The creator id for the route.
+ * @returns {RenderResult} The render result.
+ */
 function renderViewCreator(id = creator.id) {
   return render(
     <MemoryRouter initialEntries={[`/creator/${id}`]}>

@@ -1,3 +1,7 @@
+/**
+ * useCreator hook tests: initial load, reload on id change, stale-response
+ * ignoring, and no state updates after unmount. Mocks Supabase.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useCreator } from './useCreator'
@@ -13,6 +17,12 @@ import { supabase } from './client'
 const ada = { id: '42', name: 'Ada Lovelace' }
 const katherine = { id: '43', name: 'Katherine Johnson' }
 
+/**
+ * Stubs the supabase query chain to resolve with the given data.
+ * @param {Object} options
+ * @param {Object|null} options.data - The creator to resolve, or null for not-found.
+ * @returns {Object} The mocked query object.
+ */
 function mockQuery({ data }) {
   const query = {
     select: vi.fn(),

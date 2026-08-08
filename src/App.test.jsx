@@ -1,3 +1,7 @@
+/**
+ * Route-level tests for App: verifies each route renders its page and that
+ * ViewCreator/EditCreator read the id from the URL param. Mocks Supabase.
+ */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -28,6 +32,10 @@ vi.mock('./lib/client', () => {
   }
 })
 
+/**
+ * Renders the app at the given path.
+ * @param {string} path - The URL to start at.
+ */
 function renderAt(path) {
   render(
     <MemoryRouter initialEntries={[path]}>

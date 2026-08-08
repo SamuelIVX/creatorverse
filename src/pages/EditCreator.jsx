@@ -1,9 +1,18 @@
+/**
+ * EditCreator: page for editing (and deleting) a creator at /edit/:id.
+ * Uses the shared useCreator hook to load the record, pre-fills CreatorForm,
+ * and submits updates back to Supabase. Also hosts the delete button.
+ */
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import { useCreator } from '../lib/useCreator'
 import CreatorForm from '../components/CreatorForm'
 
+/**
+ * Renders the edit/delete form for a creator.
+ * @returns {JSX.Element} Loading, not-found, or the pre-filled form.
+ */
 export default function EditCreator() {
   const { id } = useParams()
   const { creator, loading } = useCreator(id)

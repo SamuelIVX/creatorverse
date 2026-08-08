@@ -1,8 +1,17 @@
+/**
+ * AddCreator: page for creating a new creator at /add.
+ * Owns form state and submits a new row to Supabase via CreatorForm; on
+ * success navigates to the homepage.
+ */
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import CreatorForm from '../components/CreatorForm'
 
+/**
+ * Renders the add-creator form.
+ * @returns {JSX.Element} The add page with the shared form.
+ */
 export default function AddCreator() {
   const [form, setForm] = useState({ name: '', url: '', description: '', imageURL: '' })
   const [error, setError] = useState(null)

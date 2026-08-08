@@ -1,6 +1,16 @@
+/**
+ * client tests: verifies the Supabase client exports a usable query builder,
+ * that .env is git-ignored, and (when real env is set) that the live database
+ * schema matches the spec.
+ */
 import { describe, it, expect, vi } from 'vitest'
 import { execFileSync } from 'node:child_process'
 
+/**
+ * Whether a value is a placeholder (unset, `<...>`, or `...example...`).
+ * @param {string} value - The env value to check.
+ * @returns {boolean} True if the value is not a real credential.
+ */
 const isPlaceholder = (value) =>
   !value || value.includes('<') || value.includes('example')
 
