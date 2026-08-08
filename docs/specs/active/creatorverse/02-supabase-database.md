@@ -59,6 +59,17 @@ payloads by the mutation specs (`07-add-creator`, `08-update-creator`).
 - Prework instructs hard-coding `URL`/`API_KEY` in `client.js`; this spec uses
   env vars instead to avoid leaking keys to GitHub. Functionally equivalent for
   grading. [confirmed — deviation documented]
+- **Implementation note:** Provisioned programmatically via the Supabase Management
+  API (`POST /v1/projects`, `POST /v1/projects/{ref}/database/query`) instead of the
+  dashboard. Project `wzgfswtqkoyzjahbbrie` (ref) in org `chfloctohvpnpavhitin`,
+  region `us-east-1`, free plan. `creators` table created with raw SQL using quoted
+  `"imageURL"` to preserve exact case (supersedes the dashboard-editor note in R8).
+  RLS disabled, Realtime enabled. Five rows seeded via SQL. `.env` holds the real
+  URL + anon key. The live-DB tests were already in place; a test bug surfaced once
+  they ran — test 1 (`client_exports_supabase`) stubbed env + `vi.resetModules()` +
+  cached an `example.supabase.co`-bound client, which the DB tests then reused
+  (DNS failure). Fixed with `vi.resetModules()` in a `beforeEach` inside the
+  `describe.skipIf(!hasEnv)` block.
 
 ## Tests
 - `client_exports_supabase`: importing `{ supabase }` yields a defined client.
