@@ -6,16 +6,26 @@ export function useCreator(id) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setCreator(null)
+
     const fetchCreator = async () => {
       const { data } = await supabase
         .from('creators')
         .select('*')
         .eq('id', id)
         .maybeSingle()
-      setCreator(data)
-      setLoading(false)
+      if (!cancelled) {
+        setCreator(data)
+        setLoading(false)
+      }
     }
     fetchCreator()
+
+    return () => {
+      cancelled = true
+    }
   }, [id])
 
   return { creator, loading }

@@ -70,7 +70,7 @@ export default function EditCreator() {
 ```
 Edit entry points: `<Link to={`/edit/${id}`}>Edit</Link>` on Card and ViewCreator.
 
-> **Implementation note (refactor):** the fetch + loading/not-found behavior comes from the shared `useCreator(id)` hook (`src/lib/useCreator.js`), and the four-field form from the shared `CreatorForm` component (`src/components/CreatorForm.jsx`) — both also used elsewhere, per the DRY cleanup. Behavior is unchanged from the design above.
+> **Implementation note (refactor):** the fetch comes from the shared `useCreator(id)` hook (`src/lib/useCreator.js`) — the hook owns fetching and the shared `creator`/`loading` state (resetting both on `id` change and ignoring stale responses); `EditCreator` retains the loading and not-found render guards and owns the form state, prefill, update, and delete. The four-field form is rendered by the shared `CreatorForm` component (`src/components/CreatorForm.jsx`) with `EditCreator` supplying `form`, `onChange`, `onSubmit`, and the delete button via `children`. Behavior is unchanged from the design above.
 
 ## Current State
 - `EditCreator` renders placeholder content from spec 03. [confirmed]

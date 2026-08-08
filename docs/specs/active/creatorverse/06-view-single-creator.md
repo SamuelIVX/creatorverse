@@ -60,7 +60,7 @@ export default function ViewCreator() {
 ## Current State
 - `ViewCreator` renders placeholder content from spec 03. [confirmed]
 - `/creator/:id` route is defined. [confirmed — spec 03]
-- **Implementation note (refactor):** the fetch + loading/not-found behavior is extracted into the shared `useCreator(id)` hook in `src/lib/useCreator.js` (also used by `EditCreator`), per the DRY cleanup. The fetch query, state, and guards below are unchanged in behavior.
+- **Implementation note (refactor):** the fetch is extracted into the shared `useCreator(id)` hook in `src/lib/useCreator.js` (also used by `EditCreator`). The hook owns fetching and the shared `creator`/`loading` state, including resetting both on `id` change and ignoring stale responses after a change/unmount. `ViewCreator` retains the loading and not-found render guards below, so behavior is unchanged.
 
 ## Tests
 - `reads_id_param`: component reads `id` from `useParams`.
