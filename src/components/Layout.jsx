@@ -1,6 +1,7 @@
 /**
  * Layout: the shared app shell wrapping every route — sticky header with brand
- * wordmark + Home/Add nav, a main content region, and a footer.
+ * wordmark, a main content region, and a footer. The brand links home, so no
+ * nav links are needed.
  * @param {Object} props
  * @param {React.ReactNode} props.children - The matched route's page.
  * @returns {JSX.Element} The app shell.
@@ -18,14 +19,6 @@ export default function Layout({ children }) {
             Creatorverse
             <span className="brand-dot" aria-hidden="true" />
           </Link>
-          <nav className="app-nav" aria-label="Primary">
-            <Link to="/" className="btn btn-sm">
-              Home
-            </Link>
-            <Link to="/add" className="btn btn-sm btn-primary">
-              Add Creator
-            </Link>
-          </nav>
         </div>
       </header>
       <main>

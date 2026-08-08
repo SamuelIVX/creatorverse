@@ -118,7 +118,7 @@ describe('ShowCreators', () => {
   it('nav_link_routes_to_add', async () => {
     mockRows([])
     renderWithRoutes()
-    fireEvent.click(screen.getByRole('link', { name: /add a creator/i }))
+    fireEvent.click(screen.getByRole('link', { name: /add creator/i }))
     expect(await screen.findByText('ADD PAGE')).toBeInTheDocument()
   })
 

@@ -52,11 +52,6 @@ export default function ShowCreators() {
           A hand-curated roster of builders, streamers, and educators — one
           place to keep the channels that actually deliver.
         </p>
-        <div className="hero-actions">
-          <Link to="/add" className="btn btn-primary">
-            Add a creator
-          </Link>
-        </div>
         <div className="search">
           <div className="search-wrap">
             <span className="search-icon" aria-hidden="true">
@@ -74,6 +69,9 @@ export default function ShowCreators() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
+          <Link to="/add" className="btn btn-primary search-add">
+            Add Creator
+          </Link>
         </div>
       </section>
 

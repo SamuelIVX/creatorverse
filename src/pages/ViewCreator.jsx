@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useCreator } from '../lib/useCreator'
+import BackButton from '../components/BackButton'
 
 /**
  * Renders a creator's full details.
@@ -24,6 +25,9 @@ export default function ViewCreator() {
 
   return (
     <div className="container">
+      <div className="page-nav">
+        <BackButton />
+      </div>
       <article className="profile">
         <div className="profile-cover" aria-hidden="true" />
         <div className="profile-main">

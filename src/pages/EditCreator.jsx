@@ -10,6 +10,7 @@ import { useCreator } from '../lib/useCreator'
 import { useToast } from '../lib/useToast'
 import CreatorForm from '../components/CreatorForm'
 import ConfirmDialog from '../components/ConfirmDialog'
+import BackButton from '../components/BackButton'
 
 /**
  * Renders the edit/delete form for a creator.
@@ -84,6 +85,9 @@ export default function EditCreator() {
 
   return (
     <div className="container">
+      <div className="page-nav">
+        <BackButton />
+      </div>
       <div className="page-header">
         <h1 className="page-title">Edit Creator</h1>
       </div>

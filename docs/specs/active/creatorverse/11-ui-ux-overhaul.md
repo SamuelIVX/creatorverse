@@ -139,12 +139,22 @@ restores focus to the previously focused element.
 - **Entrance motion added (per WEB-DESIGN-RULES motion step):** one orchestrated
   entrance set instead of scattered micro-animations. `Layout` wraps each route
   in a `page-enter` div keyed by `pathname` (fade-up replays on navigation);
-  hero title/subtitle/actions/search stagger in (100/200/300ms); creator cards
+  hero title/subtitle/search stagger in (100/200ms); creator cards
   cascade via `--card-i` (70ms each, capped at index 6); the hero title's
   signature white→violet gradient drifts slowly (`gradient-drift`, 12s infinite
   alternate, `background-size: 200%`). Motion tokens added: `--dur-slow`,
   `--ease-out`. All animations inherit the global `prefers-reduced-motion`
   kill-switch (0.01ms, 1 iteration).
+- **UX nits applied:** navbar trimmed to just the brand wordmark (Home was
+  redundant with the brand link; Add Creator moved to the homepage); the hero
+  CTA was removed and the search bar is now a flex row with an "Add Creator"
+  button to its right (`.search-add`); the edit/add form card and page header
+  are now centered (`margin: 0 auto`, `text-align: center`); subpages (details,
+  add, edit) gained a `BackButton` (ghost style) that returns to the previous
+  page or falls back to `/` on direct URL loads. Removed the now-unused
+  `.hero-actions` and `.app-nav` styles. Covered by
+  `nav_link_routes_to_add` (Add Creator beside search) and
+  `back_button_returns_to_home`.
 
 ## Tests
 - `design_system_applied` (replaces `pico_applied`): a loaded `<style>` tag

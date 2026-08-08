@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/client'
 import { useToast } from '../lib/useToast'
 import CreatorForm from '../components/CreatorForm'
+import BackButton from '../components/BackButton'
 
 /**
  * Renders the add-creator form.
@@ -47,6 +48,9 @@ export default function AddCreator() {
 
   return (
     <div className="container">
+      <div className="page-nav">
+        <BackButton />
+      </div>
       <div className="page-header">
         <h1 className="page-title">Add Creator</h1>
       </div>

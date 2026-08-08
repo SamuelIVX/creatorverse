@@ -180,4 +180,19 @@ describe('ViewCreator', () => {
     resolve({ data: creator, error: null })
     expect(await screen.findByRole('heading', { name: creator.name })).toBeInTheDocument()
   })
+
+  it('back_button_returns_to_home', async () => {
+    mockChain({ data: creator, error: null })
+    render(
+      <MemoryRouter initialEntries={['/creator/42']}>
+        <Routes>
+          <Route path="/" element={<p>HOME PAGE</p>} />
+          <Route path="/creator/:id" element={<ViewCreator />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByRole('heading', { name: creator.name })
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+  })
 })
