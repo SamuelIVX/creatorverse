@@ -1,0 +1,46 @@
+{
+    "extends": [
+        "config:recommended",
+        ":semanticCommits",
+        "helpers:pinGitHubActionDigests"
+    ],
+    "timezone": "America/New_York",
+    "schedule": ["every weekday"],
+    "osvVulnerabilityAlerts": true,
+    "platformAutomerge": true,
+    "prHourlyLimit": 6,
+    "rangeStrategy": "auto",
+    "labels": ["dependencies"],
+    "dependencyDashboard": true,
+    "enabledManagers": ["npm", "github-actions", "dockerfile"],
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["at any time"],
+        "automerge": true,
+        "automergeType": "pr"
+    },
+    "packageRules": [
+        {
+            "description": "Auto-merge GitHub Actions updates after required checks pass",
+            "matchManagers": ["github-actions"],
+            "automerge": true,
+            "automergeType": "pr"
+        },
+        {
+            "description": "Auto-merge npm dev dependency minor/patch updates after required checks pass",
+            "matchManagers": ["npm"],
+            "matchDepTypes": ["devDependencies"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "automergeType": "pr"
+        },
+        {
+            "description": "Auto-merge npm production dependency patch updates after required checks pass",
+            "matchManagers": ["npm"],
+            "matchDepTypes": ["dependencies"],
+            "matchUpdateTypes": ["patch"],
+            "automerge": true,
+            "automergeType": "pr"
+        }
+    ]
+}

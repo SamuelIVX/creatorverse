@@ -1,5 +1,5 @@
 ---
-name: Build
+name: Lint
 
 on:
     push:
@@ -8,19 +8,16 @@ on:
         branches: [main]
 
 concurrency:
-    group: build-${{ github.workflow }}-${{ github.ref }}
+    group: lint-${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
     contents: read
 
 jobs:
-    build:
-        name: Build
+    lint:
+        name: Lint Code Base
         runs-on: ubuntu-latest
-        env:
-            VITE_SUPABASE_URL: https://example.supabase.co
-            VITE_SUPABASE_ANON_KEY: ci-placeholder-key
 
         steps:
             - name: Checkout Code
@@ -37,8 +34,5 @@ jobs:
             - name: Install Dependencies
               run: npm ci
 
-            - name: Test
-              run: npm test
-
-            - name: Build
-              run: npm run build
+            - name: Lint
+              run: npm run lint
