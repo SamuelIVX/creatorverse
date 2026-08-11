@@ -38,7 +38,7 @@
             "description": "Auto-merge npm production dependency patch updates after required checks pass",
             "matchManagers": ["npm"],
             "matchDepTypes": ["dependencies"],
-            "matchUpdateTypes": ["patch"],
+            "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
             "automergeType": "pr"
         }
