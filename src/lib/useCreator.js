@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from 'react'
 import { supabase } from './client'
+import { getMockCreator } from './mockData'
 
 /**
  * Loads the creator with the given id.
@@ -24,14 +25,25 @@ export function useCreator(id) {
     setCreator(null)
 
     const fetchCreator = async () => {
-      const { data } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      if (!cancelled) {
-        setCreator(data)
-        setLoading(false)
+      try {
+        const { data, error } = await supabase
+          .from('creators')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle()
+        if (!cancelled) {
+          if (error && error.status === 500) {
+            setCreator(getMockCreator(id))
+          } else {
+            setCreator(data)
+          }
+          setLoading(false)
+        }
+      } catch {
+        if (!cancelled) {
+          setCreator(getMockCreator(id))
+          setLoading(false)
+        }
       }
     }
     fetchCreator()

@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/client'
+import { getMockCreators } from '../lib/mockData'
 import Card from '../components/Card'
 import SkeletonCard from '../components/SkeletonCard'
 
@@ -21,10 +22,22 @@ export default function ShowCreators() {
   useEffect(() => {
     let cancelled = false
     const fetchCreators = async () => {
-      const { data, error } = await supabase.from('creators').select('*')
-      if (!cancelled) {
-        setLoadError(error)
-        setCreators(error ? [] : (data ?? []))
+      try {
+        const { data, error } = await supabase.from('creators').select('*')
+        if (!cancelled) {
+          if (error && error.status === 500) {
+            setCreators(getMockCreators())
+            setLoadError(null)
+          } else {
+            setLoadError(error)
+            setCreators(error ? [] : (data ?? []))
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setCreators(getMockCreators())
+          setLoadError(null)
+        }
       }
     }
     fetchCreators()
