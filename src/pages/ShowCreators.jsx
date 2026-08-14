@@ -23,9 +23,9 @@ export default function ShowCreators() {
     let cancelled = false
     const fetchCreators = async () => {
       try {
-        const { data, error } = await supabase.from('creators').select('*')
+        const { data, error, status } = await supabase.from('creators').select('*')
         if (!cancelled) {
-          if (error && error.status === 500) {
+          if (status === 500) {
             setCreators(getMockCreators())
             setLoadError(null)
           } else {

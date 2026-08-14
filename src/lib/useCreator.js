@@ -26,13 +26,13 @@ export function useCreator(id) {
 
     const fetchCreator = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error, status } = await supabase
           .from('creators')
           .select('*')
           .eq('id', id)
           .maybeSingle()
         if (!cancelled) {
-          if (error && error.status === 500) {
+          if (status === 500) {
             setCreator(getMockCreator(id))
           } else {
             setCreator(data)
