@@ -31,6 +31,20 @@ describe('client', () => {
     vi.unstubAllEnvs()
   })
 
+  it('client_exports_auth_helpers', async () => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'fake-anon-key')
+    vi.resetModules()
+
+    const { signUp, signIn, signOut, getSession } = await import('./client.js')
+
+    expect(signUp).toBeTypeOf('function')
+    expect(signIn).toBeTypeOf('function')
+    expect(signOut).toBeTypeOf('function')
+    expect(getSession).toBeTypeOf('function')
+    vi.unstubAllEnvs()
+  })
+
   it('env_not_committed', () => {
     expect(() => execFileSync('git', ['check-ignore', '.env'])).not.toThrow()
   })

@@ -24,6 +24,6 @@ jobs:
           args: --verbose --no-progress './**/*.md' './**/*.html'
           fail: false
 
-      - name: Comment broken links on PR
+      - name: Fail if broken links found
         if: steps.lychee.outputs.exit_code != 0
-        run: echo "::warning::Broken links detected — see lychee output above. This check is report-only and will not block merges."
+        run: exit 1

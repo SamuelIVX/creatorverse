@@ -73,5 +73,4 @@ export default function App() {
 - Backward compatibility: must not break the router provider wiring.
 
 ## Context
-- React Router tutorial: https://reactrouter.com/en/v6.3.0/getting-started/tutorial
 - Components and Props: https://reactjs.org/docs/components-and-props.html

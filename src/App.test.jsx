@@ -3,7 +3,7 @@
  * ViewCreator/EditCreator read the id from the URL param. Mocks Supabase.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
@@ -29,7 +29,16 @@ vi.mock('./lib/client', () => {
   return {
     supabase: {
       from: vi.fn().mockReturnValue(chain(null)),
+      auth: {
+        onAuthStateChange: vi.fn(() => ({
+          data: { subscription: { unsubscribe: vi.fn() } }
+        })),
+      },
     },
+    getSession: vi.fn().mockResolvedValue({ user: { id: 'user-1', email: 'test@example.com' } }),
+    signIn: vi.fn().mockResolvedValue({ error: null }),
+    signUp: vi.fn().mockResolvedValue({ error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
   }
 })
 
@@ -66,14 +75,14 @@ describe('routes', () => {
     expect(await screen.findByRole('heading', { name: /creator 7/i })).toBeInTheDocument()
   })
 
-  it('routes_render_pages: /add renders AddCreator', () => {
+  it('routes_render_pages: /add renders AddCreator', async () => {
     renderAt('/add')
-    expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument())
   })
 
   it('routes_render_pages: /edit/:id renders EditCreator', async () => {
     renderAt('/edit/9')
-    expect(await screen.findByDisplayValue('Creator 9')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByDisplayValue('Creator 9')).toBeInTheDocument())
   })
 
   it('id_param_readable: ViewCreator reads the id from useParams', async () => {

@@ -4,18 +4,31 @@
  * and post-delete navigation. Mocks Supabase.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { ToastProvider } from '../components/Toast'
 import EditCreator from './EditCreator'
 
-vi.mock('../lib/client', () => ({
-  supabase: {
-    from: vi.fn(),
-  },
-}))
+vi.mock('../lib/client', () => {
+  const mockOnAuthStateChange = vi.fn(() => ({
+    data: { subscription: { unsubscribe: vi.fn() } }
+  }))
 
-import { supabase } from '../lib/client'
+  return {
+    supabase: {
+      from: vi.fn(),
+      auth: {
+        onAuthStateChange: mockOnAuthStateChange,
+      },
+    },
+    getSession: vi.fn().mockResolvedValue({ user: { id: 'user-1', email: 'test@example.com' } }),
+    signIn: vi.fn().mockResolvedValue({ error: null }),
+    signUp: vi.fn().mockResolvedValue({ error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+  }
+})
+
+import { supabase, getSession } from '../lib/client'
 
 const creator = {
   id: '42',
@@ -61,12 +74,12 @@ function mockChain(data, { updateError = null, deleteError = null } = {}) {
 }
 
 /**
- * Renders EditCreator at /edit/:id.
+ * Renders EditCreator at /edit/:id and waits for auth + either form or not-found state.
  * @param {string} id - The creator id for the route.
- * @returns {RenderResult} The render result.
+ * @returns {Promise<RenderResult>} The render result after auth settles.
  */
-function renderEditCreator(id = creator.id) {
-  return render(
+async function renderEditCreator(id = creator.id) {
+  const result = render(
     <ToastProvider>
       <MemoryRouter initialEntries={[`/edit/${id}`]}>
         <Routes>
@@ -75,6 +88,12 @@ function renderEditCreator(id = creator.id) {
       </MemoryRouter>
     </ToastProvider>,
   )
+  await waitFor(() => {
+    const hasForm = screen.queryByLabelText('Name') !== null
+    const hasNotFound = screen.queryByText(/creator not found/i) !== null
+    expect(hasForm || hasNotFound).toBe(true)
+  })
+  return result
 }
 
 /**
@@ -94,7 +113,7 @@ describe('EditCreator', () => {
 
   it('loads_existing_values', async () => {
     mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     const nameInput = await waitForPrefill()
     expect(nameInput).toHaveValue(creator.name)
     expect(screen.getByLabelText('Channel URL')).toHaveValue(creator.url)
@@ -104,7 +123,7 @@ describe('EditCreator', () => {
 
   it('coerces_null_image_to_empty', async () => {
     mockChain(creatorWithNullImage)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     const imageInput = screen.getByLabelText('Image URL (optional)')
     expect(imageInput).toHaveValue('')
@@ -112,14 +131,14 @@ describe('EditCreator', () => {
 
   it('not_found_state', async () => {
     mockChain(null)
-    renderEditCreator('999')
+    await renderEditCreator('999')
     expect(await screen.findByText(/creator not found/i)).toBeInTheDocument()
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
   })
 
   it('required_fields_enforced', async () => {
     mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     expect(screen.getByLabelText('Name')).toHaveAttribute('required')
     expect(screen.getByLabelText('Channel URL')).toHaveAttribute('required')
@@ -129,7 +148,7 @@ describe('EditCreator', () => {
 
   it('submit_updates_row', async () => {
     const query = mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ada King' } })
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
@@ -145,7 +164,7 @@ describe('EditCreator', () => {
 
   it('update_payload_excludes_system_columns', async () => {
     const query = mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     const payload = query.update.mock.calls[0][0]
@@ -156,7 +175,7 @@ describe('EditCreator', () => {
 
   it('blank_image_updates_null', async () => {
     const query = mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.change(screen.getByLabelText('Image URL (optional)'), { target: { value: '' } })
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
@@ -167,7 +186,7 @@ describe('EditCreator', () => {
 
   it('error_keeps_page', async () => {
     mockChain(creator, { updateError: new Error('update failed') })
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('update failed')
@@ -179,7 +198,7 @@ describe('EditCreator', () => {
     query.update.mockReturnValue({
       eq: vi.fn().mockRejectedValue(new Error('network down')),
     })
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /update creator/i }))
     expect(await screen.findByRole('alert')).toHaveTextContent('network down')
@@ -189,14 +208,14 @@ describe('EditCreator', () => {
 
   it('delete_button_present', async () => {
     mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
   })
 
   it('click_deletes_row', async () => {
     const query = mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     const dialog = screen.getByRole('dialog')
@@ -208,7 +227,7 @@ describe('EditCreator', () => {
 
   it('cancel_does_not_delete', async () => {
     const query = mockChain(creator)
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     const dialog = screen.getByRole('dialog')
@@ -219,7 +238,7 @@ describe('EditCreator', () => {
 
   it('error_keeps_page_on_delete', async () => {
     mockChain(creator, { deleteError: new Error('delete failed') })
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
@@ -232,7 +251,7 @@ describe('EditCreator', () => {
     query.delete.mockReturnValue({
       eq: vi.fn().mockRejectedValue(new Error('network down')),
     })
-    renderEditCreator()
+    await renderEditCreator()
     await waitForPrefill()
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
@@ -262,7 +281,7 @@ describe('EditCreator', () => {
       </ToastProvider>,
     )
 
-    await waitForPrefill()
+    await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
@@ -296,11 +315,44 @@ describe('EditCreator', () => {
       </ToastProvider>,
     )
 
-    await waitForPrefill()
+    await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /delete/i }))
     expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
     expect(store.rows.map((row) => row.id)).toEqual(['43'])
     expect(store.rows.map((row) => row.name)).not.toContain('Ada Lovelace')
+  })
+
+  it('auth_gate_requires_signin_when_unauthenticated', async () => {
+    getSession.mockResolvedValueOnce(null)
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByText('Sign in to edit this creator.')).toBeInTheDocument())
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument()
+  })
+
+  it('auth_gate_shows_form_when_authenticated', async () => {
+    getSession.mockResolvedValueOnce({ user: { id: 'user-1', email: 'test@example.com' } })
+    mockChain(creator)
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
+    expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
   })
 })
