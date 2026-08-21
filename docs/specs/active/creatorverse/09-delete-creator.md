@@ -25,7 +25,10 @@ are prompted to sign in before accessing the delete control.
 ```jsx
 const handleDelete = async () => {
   const { error } = await supabase.from('creators').delete().eq('id', id)
-  if (error) return // surface error + stay on page; navigate only on success
+  if (error) {
+    setError(error.message)
+    return
+  }
   navigate('/')
 }
 // <button onClick={handleDelete}>Delete</button>

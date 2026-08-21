@@ -41,7 +41,10 @@ export default function AddCreator() {
     e.preventDefault()
     const payload = { ...form, imageURL: form.imageURL || null }
     const { error } = await supabase.from('creators').insert(payload)
-    if (error) return
+    if (error) {
+      setError(error.message)
+      return
+    }
     navigate('/')
   }
 

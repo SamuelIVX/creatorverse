@@ -55,7 +55,10 @@ export default function EditCreator() {
     e.preventDefault()
     const payload = { ...form, imageURL: form.imageURL || null }
     const { error } = await supabase.from('creators').update(payload).eq('id', id)
-    if (error) return
+    if (error) {
+      setError(error.message)
+      return
+    }
     navigate(`/creator/${id}`)
   }
 

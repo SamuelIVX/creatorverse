@@ -177,4 +177,31 @@ describe('AddCreator', () => {
     await fillForm({ name: 'Grace Hopper' })
     expect(await screen.findByRole('status')).toHaveTextContent('Grace Hopper added.')
   })
+
+  it('auth_gate_requires_signin_when_unauthenticated', async () => {
+    getSession.mockResolvedValueOnce(null)
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/add']}>
+          <AddCreator />
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByText('Sign in to add a creator.')).toBeInTheDocument())
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
+    expect(chain.insert).not.toHaveBeenCalled()
+  })
+
+  it('auth_gate_shows_form_when_authenticated', async () => {
+    getSession.mockResolvedValueOnce({ user: { id: 'user-1', email: 'test@example.com' } })
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/add']}>
+          <AddCreator />
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
+    expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
+  })
 })

@@ -322,4 +322,37 @@ describe('EditCreator', () => {
     expect(store.rows.map((row) => row.id)).toEqual(['43'])
     expect(store.rows.map((row) => row.name)).not.toContain('Ada Lovelace')
   })
+
+  it('auth_gate_requires_signin_when_unauthenticated', async () => {
+    getSession.mockResolvedValueOnce(null)
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByText('Sign in to edit this creator.')).toBeInTheDocument())
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument()
+  })
+
+  it('auth_gate_shows_form_when_authenticated', async () => {
+    getSession.mockResolvedValueOnce({ user: { id: 'user-1', email: 'test@example.com' } })
+    mockChain(creator)
+    render(
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/edit/42']}>
+          <Routes>
+            <Route path="/edit/:id" element={<EditCreator />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>,
+    )
+    await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
+    expect(screen.getByRole('heading', { name: /edit creator/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument()
+  })
 })

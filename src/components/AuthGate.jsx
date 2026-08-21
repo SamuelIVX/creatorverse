@@ -20,7 +20,7 @@ export default function AuthGate({ children, fallback }) {
   if (session) {
     return (
       <div>
-        <button onClick={() => signOut()}>Sign out</button>
+        <button type="button" onClick={() => signOut()}>Sign out</button>
         {children(session.user)}
       </div>
     )
@@ -39,13 +39,15 @@ export default function AuthGate({ children, fallback }) {
     <div>
       {fallback && <p>{fallback}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <label htmlFor="auth-email">Email</label>
+        <input id="auth-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <label htmlFor="auth-password">Password</label>
+        <input id="auth-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">{mode === 'signin' ? 'Sign in' : 'Sign up'}</button>
         <button type="button" onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}>
           {mode === 'signin' ? 'Need an account?' : 'Have an account?'}
         </button>
-        {error && <p>{error}</p>}
+        {error && <p role="alert">{error}</p>}
       </form>
     </div>
   )

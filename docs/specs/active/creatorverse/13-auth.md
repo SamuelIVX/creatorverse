@@ -41,17 +41,37 @@ create policy creators_public_read on public.creators
   to anon, authenticated
   using (true);
 
-create policy creators_anon_no_write on public.creators
-  for insert, update, delete
+create policy creators_anon_no_insert on public.creators
+  for insert
+  to anon
+  with check (false);
+
+create policy creators_anon_no_update on public.creators
+  for update
   to anon
   using (false)
   with check (false);
 
-create policy creators_authenticated_write on public.creators
-  for insert, update, delete
+create policy creators_anon_no_delete on public.creators
+  for delete
+  to anon
+  using (false);
+
+create policy creators_authenticated_insert on public.creators
+  for insert
+  to authenticated
+  with check (true);
+
+create policy creators_authenticated_update on public.creators
+  for update
   to authenticated
   using (true)
   with check (true);
+
+create policy creators_authenticated_delete on public.creators
+  for delete
+  to authenticated
+  using (true);
 ```
 
 ### Auth helpers (`src/lib/client.js`)
@@ -93,8 +113,8 @@ a manual redirect.
 
 ```jsx
 import { useState, useEffect } from 'react'
-import { supabase } from '../client'
-import { getSession, signIn, signUp, signOut } from '../client'
+import { supabase } from '../lib/client'
+import { getSession, signIn, signUp, signOut } from '../lib/client'
 
 export default function AuthGate({ children, fallback }) {
   const [session, setSession] = useState(null)
@@ -114,7 +134,7 @@ export default function AuthGate({ children, fallback }) {
   if (session) {
     return (
       <div>
-        <button onClick={() => signOut()}>Sign out</button>
+        <button type="button" onClick={() => signOut()}>Sign out</button>
         {children(session.user)}
       </div>
     )
@@ -133,13 +153,15 @@ export default function AuthGate({ children, fallback }) {
     <div>
       {fallback && <p>{fallback}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <label htmlFor="auth-email">Email</label>
+        <input id="auth-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <label htmlFor="auth-password">Password</label>
+        <input id="auth-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">{mode === 'signin' ? 'Sign in' : 'Sign up'}</button>
         <button type="button" onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}>
           {mode === 'signin' ? 'Need an account?' : 'Have an account?'}
         </button>
-        {error && <p>{error}</p>}
+        {error && <p role="alert">{error}</p>}
       </form>
     </div>
   )
@@ -185,10 +207,10 @@ rejected. This spec does not rewrite those tests; implementers should update the
 to match the new auth-gated behavior.
 
 ## Current State
-- `creators` table has RLS disabled. [confirmed — spec 02, line 16]
-- `client.js` exports only the Supabase client, no auth helpers. [confirmed]
-- No auth UI exists in any page. [confirmed]
-- Specs 07, 08, 09 allow writes unconditionally. [confirmed]
+- `creators` table has RLS enabled with policies applied. [confirmed]
+- `src/lib/client.js` exports Supabase client plus auth helpers (`signUp`, `signIn`, `signOut`, `getSession`). [confirmed]
+- `AuthGate` component exists and wraps `AddCreator` and `EditCreator`. [confirmed]
+- Specs 07, 08, 09 updated for authenticated write flows. [confirmed]
 
 ## Tests
 - `rls_enabled`: `creators` table has RLS enabled.
