@@ -85,7 +85,6 @@ export default function ShowCreators() {
           <Link to="/add" className="btn btn-primary search-add">
             Add Creator
           </Link>
-          <span className="search-auth-hint">Sign in to add or edit creators.</span>
         </div>
       </section>
 

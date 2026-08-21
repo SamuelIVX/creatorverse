@@ -1,0 +1,48 @@
+/**
+ * AuthNav styles: navbar authentication widget.
+ * Uses existing design tokens and component classes.
+ */
+
+.auth-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-nav--authenticated {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.auth-nav__email {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-nav__dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  right: 0;
+  width: min(320px, calc(100vw - 2rem));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-2);
+  z-index: 20;
+}
+
+.auth-nav__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.auth-nav__form .field {
+  margin-bottom: 0;
+}
