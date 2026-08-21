@@ -6,17 +6,18 @@
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 export default {
   testRunner: 'vitest',
+  testRunnerNodeArgs: ['--no-warnings'],
+  vitest: { related: false },
   coverageAnalysis: 'perTest',
   reporters: ['progress', 'clear-text', 'html'],
   htmlReporter: { fileName: 'reports/mutation/index.html' },
 
   // These repos have no src/ — cover the App Router layout explicitly.
   mutate: [
-    '{src,app,components,lib,hooks,utils}/**/*.{ts,tsx}',
-    '!**/*.{test,spec}.{ts,tsx}',
+    '{src,app,components,lib,hooks,utils}/**/*.{ts,tsx,jsx}',
+    '!**/*.{test,spec}.{ts,tsx,jsx}',
     '!**/__tests__/**',
     '!**/*.d.ts',
-    // Framework entrypoints: exercised by integration/e2e, not unit tests.
     '!**/app/**/{layout,page,loading,error,not-found,template,route}.tsx',
     '!**/middleware.ts',
   ],
