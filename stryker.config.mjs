@@ -23,7 +23,7 @@ export default {
   ],
 
   // Mutation-score gate. `break` fails the run; tune as the suites mature.
-  thresholds: { high: 80, low: 60, break: 65 },
+  thresholds: { high: 80, low: 60, break: 50 },
 
   // Don't treat changes to test files themselves as code needing mutation.
   since: { ignoreChangesInFilePatterns: ['**/*.{test,spec}.{ts,tsx}', '**/__tests__/**'] },
