@@ -29,7 +29,7 @@ vi.mock('../lib/client', () => {
   }
 })
 
-import { supabase } from '../lib/client'
+import { supabase, getSession } from '../lib/client'
 
 const store = { rows: [] }
 
