@@ -9,11 +9,8 @@ import { supabase } from '../lib/client'
 import { useToast } from '../lib/useToast'
 import CreatorForm from '../components/CreatorForm'
 import BackButton from '../components/BackButton'
+import AuthGate from '../components/AuthGate'
 
-/**
- * Renders the add-creator form.
- * @returns {JSX.Element} The add page with the shared form.
- */
 export default function AddCreator() {
   const [form, setForm] = useState({ name: '', url: '', description: '', imageURL: '' })
   const [error, setError] = useState(null)
@@ -47,21 +44,25 @@ export default function AddCreator() {
   }
 
   return (
-    <div className="container">
-      <div className="page-nav">
-        <BackButton />
-      </div>
-      <div className="page-header">
-        <h1 className="page-title">Add Creator</h1>
-      </div>
-      <CreatorForm
-        form={form}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-        submitLabel="Add Creator"
-        submitting={submitting}
-        error={error}
-      />
-    </div>
+    <AuthGate fallback="Sign in to add a creator.">
+      {() => (
+        <div className="container">
+          <div className="page-nav">
+            <BackButton />
+          </div>
+          <div className="page-header">
+            <h1 className="page-title">Add Creator</h1>
+          </div>
+          <CreatorForm
+            form={form}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            submitLabel="Add Creator"
+            submitting={submitting}
+            error={error}
+          />
+        </div>
+      )}
+    </AuthGate>
   )
 }

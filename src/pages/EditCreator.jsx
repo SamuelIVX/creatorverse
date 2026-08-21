@@ -11,11 +11,8 @@ import { useToast } from '../lib/useToast'
 import CreatorForm from '../components/CreatorForm'
 import ConfirmDialog from '../components/ConfirmDialog'
 import BackButton from '../components/BackButton'
+import AuthGate from '../components/AuthGate'
 
-/**
- * Renders the edit/delete form for a creator.
- * @returns {JSX.Element} Loading, not-found, or the pre-filled form.
- */
 export default function EditCreator() {
   const { id } = useParams()
   const { creator, loading } = useCreator(id)
@@ -80,43 +77,52 @@ export default function EditCreator() {
     }
   }
 
-  if (loading) return <p>Loading…</p>
-  if (!creator) return <p>Creator not found.</p>
-
   return (
-    <div className="container">
-      <div className="page-nav">
-        <BackButton />
-      </div>
-      <div className="page-header">
-        <h1 className="page-title">Edit Creator</h1>
-      </div>
-      <CreatorForm
-        form={form}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-        submitLabel="Update Creator"
-        submitting={submitting}
-        error={error}
-      >
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() => setConfirmOpen(true)}
-          disabled={deleting}
-        >
-          {deleting ? 'Deleting…' : 'Delete'}
-        </button>
-      </CreatorForm>
-      <ConfirmDialog
-        open={confirmOpen}
-        title="Delete this creator?"
-        message={`"${creator.name}" will be permanently removed. This cannot be undone.`}
-        confirmLabel="Delete"
-        disabled={deleting}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmOpen(false)}
-      />
-    </div>
+    <AuthGate fallback="Sign in to edit this creator.">
+      {() => (
+        <div className="container">
+          <div className="page-nav">
+            <BackButton />
+          </div>
+          <div className="page-header">
+            <h1 className="page-title">Edit Creator</h1>
+          </div>
+          {loading ? (
+            <p>Loading…</p>
+          ) : !creator ? (
+            <p>Creator not found.</p>
+          ) : (
+            <>
+              <CreatorForm
+                form={form}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+                submitLabel="Update Creator"
+                submitting={submitting}
+                error={error}
+              >
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => setConfirmOpen(true)}
+                  disabled={deleting}
+                >
+                  {deleting ? 'Deleting…' : 'Delete'}
+                </button>
+              </CreatorForm>
+              <ConfirmDialog
+                open={confirmOpen}
+                title="Delete this creator?"
+                message={`"${creator.name}" will be permanently removed. This cannot be undone.`}
+                confirmLabel="Delete"
+                disabled={deleting}
+                onConfirm={handleDelete}
+                onCancel={() => setConfirmOpen(false)}
+              />
+            </>
+          )}
+        </div>
+      )}
+    </AuthGate>
   )
 }

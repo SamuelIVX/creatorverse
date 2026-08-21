@@ -4,17 +4,30 @@
  * Mocks Supabase.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import App from '../App'
 import { ToastProvider } from '../components/Toast'
 import AddCreator from './AddCreator'
 
-vi.mock('../lib/client', () => ({
-  supabase: {
-    from: vi.fn(),
-  },
-}))
+vi.mock('../lib/client', () => {
+  const mockOnAuthStateChange = vi.fn(() => ({
+    data: { subscription: { unsubscribe: vi.fn() } }
+  }))
+
+  return {
+    supabase: {
+      from: vi.fn(),
+      auth: {
+        onAuthStateChange: mockOnAuthStateChange,
+      },
+    },
+    getSession: vi.fn().mockResolvedValue({ user: { id: 'user-1', email: 'test@example.com' } }),
+    signIn: vi.fn().mockResolvedValue({ error: null }),
+    signUp: vi.fn().mockResolvedValue({ error: null }),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+  }
+})
 
 import { supabase } from '../lib/client'
 
@@ -39,29 +52,33 @@ function makeChain() {
 let chain
 
 /**
- * Renders AddCreator at /add.
- * @returns {RenderResult} The render result.
+ * Renders AddCreator at /add and waits for the auth gate to resolve.
+ * @returns {Promise<RenderResult>} The render result after auth settles.
  */
-function renderAddCreator() {
-  return render(
+async function renderAddCreator() {
+  const result = render(
     <ToastProvider>
       <MemoryRouter initialEntries={['/add']}>
         <AddCreator />
       </MemoryRouter>
     </ToastProvider>,
   )
+  await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
+  return result
 }
 
 /**
  * Renders the full App at /add (to exercise post-add navigation).
- * @returns {RenderResult} The render result.
+ * @returns {Promise<RenderResult>} The render result after auth settles.
  */
-function renderAppAtAdd() {
-  return render(
+async function renderAppAtAdd() {
+  const result = render(
     <MemoryRouter initialEntries={['/add']}>
       <App />
     </MemoryRouter>,
   )
+  await waitFor(() => expect(screen.getByLabelText('Name')).toBeInTheDocument())
+  return result
 }
 
 /**
@@ -86,16 +103,16 @@ describe('AddCreator', () => {
     supabase.from.mockReturnValue(chain)
   })
 
-  it('form_has_all_fields', () => {
-    renderAddCreator()
+  it('form_has_all_fields', async () => {
+    await renderAddCreator()
     expect(screen.getByLabelText('Name')).toBeInTheDocument()
     expect(screen.getByLabelText('Channel URL')).toBeInTheDocument()
     expect(screen.getByLabelText('Description')).toBeInTheDocument()
     expect(screen.getByLabelText('Image URL (optional)')).toBeInTheDocument()
   })
 
-  it('required_fields_enforced', () => {
-    renderAddCreator()
+  it('required_fields_enforced', async () => {
+    await renderAddCreator()
     expect(screen.getByLabelText('Name')).toHaveAttribute('required')
     expect(screen.getByLabelText('Channel URL')).toHaveAttribute('required')
     expect(screen.getByLabelText('Description')).toHaveAttribute('required')
@@ -103,7 +120,7 @@ describe('AddCreator', () => {
   })
 
   it('submit_inserts_row', async () => {
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm()
     expect(chain.insert).toHaveBeenCalledWith({
       name: 'Grace Hopper',
@@ -114,7 +131,7 @@ describe('AddCreator', () => {
   })
 
   it('blank_image_inserts_null', async () => {
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm({ imageURL: '' })
     expect(chain.insert).toHaveBeenCalledWith(
       expect.objectContaining({ imageURL: null }),
@@ -122,7 +139,7 @@ describe('AddCreator', () => {
   })
 
   it('provides_image_when_given', async () => {
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm({ imageURL: 'https://grace.example/portrait.png' })
     expect(chain.insert).toHaveBeenCalledWith(
       expect.objectContaining({ imageURL: 'https://grace.example/portrait.png' }),
@@ -131,7 +148,7 @@ describe('AddCreator', () => {
 
   it('error_keeps_page', async () => {
     chain.insert.mockResolvedValue({ error: new Error('insert failed') })
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm()
     expect(await screen.findByRole('alert')).toHaveTextContent('insert failed')
     expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
@@ -140,7 +157,7 @@ describe('AddCreator', () => {
 
   it('rejected_insert_keeps_page', async () => {
     chain.insert.mockRejectedValue(new Error('network down'))
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm()
     expect(await screen.findByRole('alert')).toHaveTextContent('network down')
     expect(screen.getByRole('heading', { name: /add creator/i })).toBeInTheDocument()
@@ -148,7 +165,7 @@ describe('AddCreator', () => {
   })
 
   it('new_creator_appears', async () => {
-    renderAppAtAdd()
+    await renderAppAtAdd()
     await fillForm({ name: 'Katherine Johnson' })
     expect(
       await screen.findByRole('heading', { name: 'Katherine Johnson' }),
@@ -156,7 +173,7 @@ describe('AddCreator', () => {
   })
 
   it('toast_on_add_success', async () => {
-    renderAddCreator()
+    await renderAddCreator()
     await fillForm({ name: 'Grace Hopper' })
     expect(await screen.findByRole('status')).toHaveTextContent('Grace Hopper added.')
   })
