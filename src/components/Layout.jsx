@@ -7,6 +7,7 @@
  * @returns {JSX.Element} The app shell.
  */
 import { Link, useLocation } from 'react-router-dom'
+import AuthNav from './AuthNav'
 
 export default function Layout({ children }) {
   const { pathname } = useLocation()
@@ -19,6 +20,7 @@ export default function Layout({ children }) {
             Creatorverse
             <span className="brand-dot" aria-hidden="true" />
           </Link>
+          <AuthNav />
         </div>
       </header>
       <main>
